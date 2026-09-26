@@ -22,7 +22,7 @@ const cells = feedCells(site, style);
 const cover = coverOf(site, style);
 const PAGE = 12;
 
-const title = fill(copy.titles.style, { style: style.name, name: studio.name });
+const title = fill(copy.titles.style, { style: style.name, name: studio.name, area: studio.addressShort });
 const cellStyle = ({ desktop: d, mobile: m }: (typeof cells)[number], i: number) =>
   [
     `--c:${d.c};--cw:${d.w};--r:${d.r};--rh:${d.h}`,
@@ -122,7 +122,8 @@ const cellSizes = ({ desktop: d, mobile: m }: (typeof cells)[number], i: number)
     grid-row: var(--mr) / span var(--mh);
     border: calc(var(--gap) / 2) solid var(--seam);
   }
-  .js .item.is-hidden { display: none; }
+  /* .js sits on <html>, outside this component: without :global() Astro scopes it and the rule never matches */
+  :global(.js) .item.is-hidden { display: none; }
   .item a { position: absolute; inset: 0; display: block; }
   .item a:focus-visible { outline-offset: -2px; }
   .item :global(img) { position: absolute; inset: 0; }
@@ -152,6 +153,11 @@ const cellSizes = ({ desktop: d, mobile: m }: (typeof cells)[number], i: number)
     .feed {
       grid-template-columns: repeat(12, minmax(0, 1fr));
       grid-auto-rows: min(calc(100vw / 24), var(--row-max));
+      /* The markup is in phone reading order; this makes Tab follow the desktop
+         mosaic row by row instead. Chrome/Edge 137+ only, and in Chrome 153 only
+         without JavaScript; with JavaScript, src/scripts/site.ts reorders the
+         markup, which works in every browser. */
+      reading-flow: grid-rows;
     }
     .item {
       grid-column: var(--c) / span var(--cw);

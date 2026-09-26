@@ -10,7 +10,7 @@ interface Props {
 const site = getSite(Astro.props.lang);
 const { studio, copy, prefix } = site;
 const recent = [...site.pieces].sort((a, b) => b.weight - a.weight).slice(0, 6);
-const title = fill(copy.titles.artist, { artist: studio.artist, name: studio.name });
+const title = fill(copy.titles.artist, { artist: studio.artist, name: studio.name, area: studio.addressShort });
 ---
 
 <Base site={site} title={title} description={studio.about} image={recent[0]?.photo} imageAlt={recent[0]?.alt} current="artist">

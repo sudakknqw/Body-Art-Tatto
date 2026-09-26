@@ -8,7 +8,7 @@ interface Props {
 const site = getSite(Astro.props.lang);
 const { studio, copy, styles, prefix } = site;
 const t = copy.infoPage;
-const title = fill(copy.titles.info, { name: studio.name });
+const title = fill(copy.titles.info, { name: studio.name, area: studio.addressShort });
 const description = fill(copy.descriptions.info, {
   min: studio.priceMinimum,
   hourly: studio.priceHourly,

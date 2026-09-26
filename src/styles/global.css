@@ -311,6 +311,24 @@ html.no-transition *::after { transition: none !important; }
   .reveal.is-below { opacity: 0; transform: translateY(8px); transition: none; }
   .btn.is-leaving { opacity: 0; transition: opacity 120ms cubic-bezier(0.4, 0, 1, 1); }
 
+  /* Slow page change: a thin bar along the top, added by src/scripts/site.ts
+     only when the next page takes more than 300ms. It creeps towards 90% and is
+     removed the moment the page is ready, before the transition starts. */
+  .nav-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 40;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    pointer-events: none;
+    animation:
+      nav-progress-in 200ms cubic-bezier(0.2, 0, 0, 1) both,
+      nav-progress-grow 8s cubic-bezier(0.1, 0.6, 0.2, 1) both;
+  }
+  @keyframes nav-progress-in { from { opacity: 0; } }
+  @keyframes nav-progress-grow { from { transform: scaleX(0.08); } to { transform: scaleX(0.9); } }
+
   /* Photo tiles: the image moves inside a fixed frame */
   .tile-link { overflow: hidden; }
   @media (hover: hover) {

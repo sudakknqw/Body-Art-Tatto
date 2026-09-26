@@ -124,13 +124,24 @@ const description = fill(copy.descriptions.home, {
     inset: 0;
   }
 
-  /* Scrim 1 of 2: keeps tile labels readable on any photo, in both themes */
+  /* Scrim 1 of 2: keeps tile labels readable on any photo, in both themes.
+     It fades in over the top padding only (--fade), so everything from the top
+     of the text down sits on at least 0.66 black: 4.5:1 or better even over a
+     white photo. */
   .label {
+    --fade: var(--s30);
     position: absolute;
     z-index: 1;
     inset: auto 0 0 0;
-    padding: var(--s30) var(--s12) var(--s12);
-    background: linear-gradient(to top, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0));
+    padding: var(--fade) var(--s12) var(--s12);
+    background: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0),
+      rgb(0 0 0 / 0.16) calc(var(--fade) * 0.3),
+      rgb(0 0 0 / 0.44) calc(var(--fade) * 0.6),
+      rgb(0 0 0 / 0.66) var(--fade),
+      rgb(0 0 0 / 0.8)
+    );
     display: grid;
     gap: var(--s2);
   }
@@ -165,7 +176,7 @@ const description = fill(copy.descriptions.home, {
       grid-column: var(--col);
       grid-row: var(--row);
     }
-    .label { padding: var(--s40) var(--s18) var(--s16); }
+    .label { --fade: var(--s40); padding: var(--fade) var(--s18) var(--s16); }
     h2 { font-size: 20px; }
     .tile--hero h2 { font-size: 30px; }
     .meta { font-size: 14px; }

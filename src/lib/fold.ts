@@ -1,6 +1,7 @@
 // Build-time check that a style's cover piece — the first cell of its feed —
 // is fully visible without scrolling when the feed page opens, so the
-// home tile → feed transition always lands on screen.
+// home tile → feed transition always lands on screen. A miss prints a warning
+// (src/lib/content.ts); the page itself still works.
 //
 // There is no browser at build time, so this is a model of the feed page
 // header, using the same numbers as the CSS in StyleFeed.astro and global.css.
@@ -61,16 +62,16 @@ export interface FoldResult {
 }
 
 /**
- * Bottom edge of the cover cell — 3 columns × 8 half-column rows in the first
- * row of pattern A (feedMosaic.ts) — at every checked viewport.
+ * Bottom edge of the cover cell at every checked viewport. `rows` is the
+ * cover's height in half-column rows on each layout (feedMosaic.ts).
  */
-export function checkFold(head: Head): FoldResult[] {
+export function checkFold(head: Head, rows: { mobile: number; desktop: number }): FoldResult[] {
   const mobile = MOBILE.map(({ w, h }) => {
-    const bottom = feedTop(w, head) + 8 * (w / 12);
+    const bottom = feedTop(w, head) + rows.mobile * (w / 12);
     return { ok: bottom <= h - BAR, where: `${w}×${h}`, bottom, fold: h - BAR };
   });
   const desktop = DESKTOP.map(({ w, h }) => {
-    const bottom = feedTop(w, head) + 8 * Math.min(w / 24, DESKTOP_ROW_MAX);
+    const bottom = feedTop(w, head) + rows.desktop * Math.min(w / 24, DESKTOP_ROW_MAX);
     return { ok: bottom <= h, where: `${w}×${h}`, bottom, fold: h };
   });
   return [...mobile, ...desktop];

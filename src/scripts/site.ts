@@ -7,7 +7,7 @@
 // shared names on the old page are set inside the navigation loader, and names
 // on the new page in `astro:after-swap`, before its snapshot is taken.
 import type { TransitionBeforePreparationEvent, TransitionBeforeSwapEvent } from 'astro:transitions/client';
-import { isHomePath as isHome } from '../lib/layout';
+import { BP, isHomePath as isHome } from '../lib/layout';
 
 const root = document.documentElement;
 const motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
@@ -112,6 +112,24 @@ function tileDirections(tile: HTMLElement) {
     .join('');
 }
 
+// ---------- Slow page changes: a thin bar after 300ms (none with reduced motion) ----------
+let progressTimer = 0;
+const startProgress = () => {
+  if (!motion || progressTimer) return; // a second tap keeps the bar already running
+  progressTimer = window.setTimeout(() => {
+    const bar = document.body.appendChild(document.createElement('div'));
+    bar.className = 'nav-progress';
+    bar.setAttribute('aria-hidden', 'true');
+  }, 300);
+};
+const stopProgress = () => {
+  clearTimeout(progressTimer);
+  progressTimer = 0;
+  $('.nav-progress')?.remove();
+};
+// Back from another site via the back-forward cache.
+addEventListener('pageshow', (e) => e.persisted && stopProgress());
+
 // ---------- Navigation ----------
 let nav: { from: string; to: string; type: string } | null = null;
 let directions = '';
@@ -165,12 +183,15 @@ document.addEventListener('astro:before-preparation', (e) => {
   const from = ev.from.pathname;
   const to = ev.to.pathname;
   nav = { from, to, type: ev.navigationType };
+  startProgress();
   const load = ev.loader;
   ev.loader = async () => {
     await load();
+    // Aborted: a newer navigation owns the bar. Prevented: a full page load follows.
     if (ev.defaultPrevented || ev.signal.aborted) return;
     leave(from, to);
     if (morphs) await preload(ev.newDocument);
+    stopProgress(); // before the old page is snapshotted
   };
 });
 
@@ -201,6 +222,7 @@ document.addEventListener('astro:before-swap', (e) => {
 });
 
 document.addEventListener('astro:after-swap', () => {
+  stopProgress();
   if (!nav) return;
   const { from, to, type } = nav;
   nav = null;
@@ -288,9 +310,31 @@ function fadeInPhotos() {
   );
 }
 
+// ---------- Feed order ----------
+// The markup lists the pieces in phone reading order. On desktop they are put
+// in the desktop mosaic's order, row by row, so Tab and screen readers follow
+// what is on screen in every browser. (CSS `reading-flow` should do this, but
+// Chrome 153 ignores it on this page while lazy photos are in the grid.)
+// Every cell has explicit grid lines, so moving the elements changes nothing visually.
+const desktop = matchMedia(`(min-width: ${BP.desktop}px)`);
+function orderFeed() {
+  const list = $('[data-feed]');
+  if (!list) return;
+  const [row, col] = desktop.matches ? ['--r', '--c'] : ['--mr', '--mc'];
+  const at = (li: HTMLElement, v: string) => Number(li.style.getPropertyValue(v));
+  const items = [...list.children] as HTMLElement[];
+  const sorted = [...items].sort((a, z) => at(a, row) - at(z, row) || at(a, col) - at(z, col));
+  if (sorted.every((li, i) => li === items[i])) return;
+  const focused = document.activeElement;
+  list.append(...sorted);
+  if (focused instanceof HTMLElement && list.contains(focused)) focused.focus({ preventScroll: true });
+}
+desktop.addEventListener('change', orderFeed);
+
 /** Feed: pieces fade up as they scroll in; "Show more" reveals the next 12. */
 function feed() {
   const PAGE = 12;
+  orderFeed();
   const items = [...document.querySelectorAll<HTMLElement>('[data-feed] > li')];
   if (!items.length) return;
   if (motion && 'IntersectionObserver' in window) {
@@ -317,7 +361,8 @@ function feed() {
 
   const button = $<HTMLButtonElement>('[data-more]');
   button?.addEventListener('click', () => {
-    const batch = items.filter((el) => el.classList.contains('is-hidden')).slice(0, PAGE);
+    // In the current order (phone or desktop), so batch[0] is the first new piece on screen.
+    const batch = [...document.querySelectorAll<HTMLElement>('[data-feed] > li.is-hidden')].slice(0, PAGE);
     batch.forEach((el) => {
       enter(el);
       el.classList.remove('is-hidden');

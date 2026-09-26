@@ -46,16 +46,16 @@
   "notFoundText": "This page doesn't exist. The work is still here.",
   "titles": {
     "home": "{name} — {tagline}",
-    "style": "{style} tattoos in Bangkok — {name}, Ari",
-    "piece": "{piece}, {style} tattoo — {name}, Bangkok",
-    "artist": "{artist}, tattoo artist in Ari, Bangkok — {name}",
-    "info": "Prices, booking and hours — {name}, Ari Bangkok",
-    "aftercare": "Tattoo aftercare guide — {name}, Bangkok"
+    "style": "{style} tattoos in {area} — {name}",
+    "piece": "{piece}, {style} tattoo — {name}, {area}",
+    "artist": "{artist}, tattoo artist in {area} — {name}",
+    "info": "Prices, booking and hours — {name}, {area}",
+    "aftercare": "Tattoo aftercare guide — {name}, {area}"
   },
   "descriptions": {
     "home": "{tagline}. {rating} on Google from {count} reviews. Styles: {styles}. Book on WhatsApp.",
     "info": "Prices from {min} THB, {hourly} THB per hour, deposit {deposit}. How a session works, address near {bts}, opening hours {hours}.",
-    "aftercare": "How to look after a new tattoo from {name} in Bangkok: the first days, washing, sun, swimming and when to come back."
+    "aftercare": "How to look after a new tattoo from {name} in {area}: the first days, washing, sun, swimming and when to come back."
   },
   "artistPage": {
     "heading": "About the artist",

@@ -1,5 +1,6 @@
 // Loads the JSON content, validates it, and joins pieces to their photos.
-// Any problem throws, which stops `npm run build` with the message below.
+// A problem that would break the site throws, which stops `npm run build`
+// with the message below; one that only looks worse prints a warning.
 import type { ImageMetadata } from 'astro';
 import studioEn from '../content/studio.json';
 import stylesEn from '../content/styles.json';
@@ -59,6 +60,8 @@ class ContentError extends Error {
     this.name = 'ContentError';
   }
 }
+const contentWarning = (file: string, message: string) =>
+  console.warn(`\n  ⚠ Content warning in src/content/${file}\n    ${message}\n`);
 
 const photos = import.meta.glob<ImageMetadata>('../images/pieces/*.{jpg,jpeg,png,webp,avif}', {
   eager: true,
@@ -80,6 +83,9 @@ const isFilled = (v: unknown) => typeof v === 'string' && v.trim() !== '';
 
 if (!isFilled(studioEn.whatsapp)) {
   throw new ContentError('studio.json', '"whatsapp" is empty. Every booking button opens WhatsApp — use digits only, e.g. 66812345678.');
+}
+if (!isFilled(studioEn.addressShort)) {
+  throw new ContentError('studio.json', '"addressShort" is empty. It goes into the page titles, e.g. "Ari, Bangkok".');
 }
 
 const styles: Style[] = stylesEn.map((s, i) => {
@@ -137,6 +143,20 @@ const thFile = (name: string) => thFiles[`../content/${name}.th.json`] as any;
 const thNeeded = ['studio', 'styles', 'pieces', 'copy'];
 const thMissing = thNeeded.filter((n) => !thFile(n));
 
+/** Keys in `en` that `th` lacks, as paths like "nav.work" or "steps[2].title". */
+function missingKeys(en: unknown, th: unknown, path = ''): string[] {
+  if (Array.isArray(en)) {
+    if (!Array.isArray(th)) return [path];
+    return th.flatMap((t, i) => missingKeys(en[Math.min(i, en.length - 1)], t, `${path}[${i}]`));
+  }
+  if (!en || typeof en !== 'object') return [];
+  if (!th || typeof th !== 'object') return [path];
+  return Object.entries(en).flatMap(([k, v]) => {
+    const at = path ? `${path}.${k}` : k;
+    return k in th ? missingKeys(v, (th as Record<string, unknown>)[k], at) : [at];
+  });
+}
+
 function buildThai(): Site | null {
   if (thMissing.length) {
     if (thMissing.length < thNeeded.length) {
@@ -148,6 +168,15 @@ function buildThai(): Site | null {
   const stylesTh = thFile('styles') as Partial<Style>[];
   const piecesTh = thFile('pieces') as Partial<Piece>[];
   const copyTh = thFile('copy') as Copy;
+  // Every interface text is used on every page, so copy.th.json must have all of them.
+  const noText = missingKeys(copyEn, copyTh);
+  if (noText.length) {
+    throw new ContentError(
+      'copy.th.json',
+      `${noText.length} text(s) that copy.json has are missing: ${noText.slice(0, 8).join(', ')}${noText.length > 8 ? ', …' : ''}. ` +
+        'Copy them over from copy.json and translate them.',
+    );
+  }
 
   // A style or piece appears in Thai only once it has been translated.
   const thStyles: Style[] = [];
@@ -229,8 +258,8 @@ export function feedOfDesktop(s: Site, style: Style): Piece[] {
 }
 
 // Check every style in every language: the home tile's photo is the feed's
-// cover cell, and that cell is fully visible without scrolling at every
-// viewport in fold.ts.
+// cover cell (an error), and that cell is fully visible without scrolling at
+// every viewport in fold.ts (a warning, printed on every build).
 for (const s of sites) {
   const file = s.lang === 'th' ? 'styles.th.json' : 'styles.json';
   for (const style of s.styles) {
@@ -249,12 +278,13 @@ for (const s of sites) {
         [s.copy.typicalHours, `${style.typicalHours} ${s.copy.hoursShort}`],
       ],
     };
-    const low = checkFold(head).find((r) => !r.ok);
-    if (low) {
-      throw new ContentError(
+    const low = checkFold(head, { mobile: first.mobile.h, desktop: first.desktop.h }).filter((r) => !r.ok);
+    if (low.length) {
+      contentWarning(
         file,
-        `Style "${style.slug}": its cover photo "${cover.slug}" would sit below the fold at ${low.where} ` +
-          `(bottom at ${Math.round(low.bottom)}px, visible area ends at ${low.fold}px). Shorten the style's name or description.`,
+        `Style "${style.slug}": its cover photo "${cover.slug}" does not fit on the first screen at ${low.map((r) => r.where).join(', ')} ` +
+          `(it ends at ${Math.round(low[0].bottom)}px, the screen at ${low[0].fold}px), so the home → style animation lands partly off screen.\n` +
+          `    The page still works. To fix it, shorten the style's name or description (about 200 characters at most).`,
       );
     }
   }

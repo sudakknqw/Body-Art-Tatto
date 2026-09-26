@@ -37,7 +37,7 @@ const shortUrl = `${pageUrl.host}${pageUrl.pathname}`;
 const bookHref = whatsappHref(studio, fill(copy.waPiece, { name: piece.name, url: shortUrl }));
 
 const sessionsLabel = piece.sessions ? `${piece.sessions} ${piece.sessions === '1' ? copy.session : copy.sessions}` : '';
-const title = fill(copy.titles.piece, { piece: piece.name, style: style.name, name: studio.name });
+const title = fill(copy.titles.piece, { piece: piece.name, style: style.name, name: studio.name, area: studio.addressShort });
 const description = piece.note || piece.alt;
 
 const full = await getImage({ src: piece.photo, width: Math.min(1600, piece.photo.width), format: 'jpg', quality: 80 });

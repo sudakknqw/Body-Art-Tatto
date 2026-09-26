@@ -1,6 +1,6 @@
 ---
 // Responsive <picture>: AVIF (q72) + WebP (q78) + JPEG fallback,
-// 400/800/1200/1600w, explicit width/height so nothing shifts.
+// 400/600/800/1200/1600w, explicit width/height so nothing shifts.
 import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { src, alt, sizes, eager = false, fit = 'cover' } = Astro.props;
-const all = [400, 800, 1200, 1600];
+const all = [400, 600, 800, 1200, 1600];
 const widths = all.filter((w) => w <= src.width);
 // A photo smaller than 1600px also offers its own full width.
 if (src.width < 1600 && !widths.includes(src.width)) widths.push(src.width);

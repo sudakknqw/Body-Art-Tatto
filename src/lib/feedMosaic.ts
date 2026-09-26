@@ -48,6 +48,49 @@ const mobile: Pattern[] = [
   { h: 30, cells: [[0, 0, 4, 8], [4, 0, 2, 5], [4, 5, 2, 4], [0, 8, 2, 4], [2, 8, 2, 5], [4, 9, 2, 4], [0, 12, 2, 5], [2, 13, 4, 9], [0, 17, 2, 4], [0, 21, 2, 5], [2, 22, 4, 8], [0, 26, 2, 4]] },
 ];
 
+// Short batches: a style with 1–5 pieces (or the last batch of a long feed)
+// gets one of these instead of the first cells of a 12-cell pattern, which
+// would leave holes. Same rules as the patterns, plus a flat bottom edge.
+// Cover cells stay 8 rows tall like pattern A's, so the cover still fits on
+// the first screen (fold.ts); that is also why 1–3 pieces on desktop are
+// squares, and why 1–2 can't span the full width: a wider cell would have to
+// be taller or landscape.
+const shortDesktop: Cell[][] = [
+  [],
+  [[4, 0, 4, 8]],
+  [[2, 0, 4, 8], [6, 0, 4, 8]],
+  [[0, 0, 4, 8], [4, 0, 4, 8], [8, 0, 4, 8]],
+  [[0, 0, 3, 8], [3, 0, 3, 8], [6, 0, 3, 8], [9, 0, 3, 8]],
+  [[0, 0, 3, 8], [3, 0, 6, 16], [9, 0, 3, 9], [0, 8, 3, 8], [9, 9, 3, 7]],
+];
+// Phones: 4 and 5 are the top of mobile pattern A, which already ends flat there.
+const shortMobile: Cell[][] = [
+  [],
+  [[1, 0, 4, 8]],
+  [[0, 0, 3, 8], [3, 0, 3, 8]],
+  [[0, 0, 3, 8], [3, 0, 3, 8], [0, 8, 6, 12]],
+  mobile[0].cells.slice(0, 4),
+  mobile[0].cells.slice(0, 5),
+];
+export const SHORT_MAX = shortDesktop.length - 1;
+
+const pattern = (cells: Cell[]): Pattern => ({ h: Math.max(...cells.map(([, y, , h]) => y + h)), cells });
+/**
+ * Desktop short pattern for `n` pieces. With a cover, the cover cell (the
+ * 8-row cell in the first row nearest the home tile's slot, mirrored if that
+ * is closer) goes first, as pattern A's does.
+ */
+function shortPattern(n: number, slot: number | null): Pattern {
+  const cells = shortDesktop[n];
+  if (slot === null) return pattern(cells);
+  const centre = slot + 1.5;
+  const options = [cells, mirror(pattern(cells)).cells].flatMap((set) =>
+    set.map((c, i) => ({ set, i, d: Math.abs(c[0] + c[2] / 2 - centre) })).filter(({ set, i }) => set[i][1] === 0 && set[i][3] === 8),
+  );
+  const best = options.reduce((a, o) => (o.d < a.d ? o : a));
+  return pattern([best.set[best.i], ...best.set.filter((_, i) => i !== best.i)]);
+}
+
 /** Desktop cover slot (0, 3, 6 or 9) nearest the centre of the home tile [c1, c2) (1-based grid lines). */
 export function coverSlot(c1: number, c2: number): number {
   const centre = (c1 + c2) / 2 - 1;
@@ -76,8 +119,8 @@ const readingOrder = (cells: Cell[], coverFirst: boolean) =>
  * Lays out `items` (feed order, cover first) batch by batch.
  * Within a batch the cover takes the cover slot; weight-3 pieces take the
  * largest remaining cells, weight-1 the smallest, weight-2 those in between,
- * on desktop and on mobile alike. A short batch uses the first cells of its
- * pattern and ends ragged.
+ * on desktop and on mobile alike. A batch of 1–5 pieces uses a short pattern;
+ * one of 6–11 uses the first cells of its pattern and ends ragged.
  * Returned in mobile reading order, which is also the prev/next order.
  */
 export function layoutFeed<T>(items: T[], weightOf: (t: T) => number, slot: number, hasCover: boolean): FeedCell<T>[] {
@@ -86,9 +129,10 @@ export function layoutFeed<T>(items: T[], weightOf: (t: T) => number, slot: numb
   let mRow = 0;
   for (let b = 0; b * 12 < items.length; b++) {
     const batch = items.slice(b * 12, b * 12 + 12);
-    const d = [desktopA[slot], desktopB, desktopC][b % 3];
-    const m = mobile[b % 3];
     const cover = hasCover && b === 0;
+    const short = batch.length <= SHORT_MAX;
+    const d = short ? shortPattern(batch.length, cover ? slot : null) : [desktopA[slot], desktopB, desktopC][b % 3];
+    const m = short ? pattern(shortMobile[batch.length]) : mobile[b % 3];
     const dSel = readingOrder(d.cells, cover).slice(0, batch.length);
     const mSel = readingOrder(m.cells, cover).slice(0, batch.length);
     // Weight 3 pieces get the largest cells, weight 1 the smallest, weight 2
