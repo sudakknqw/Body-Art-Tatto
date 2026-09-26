@@ -4,7 +4,7 @@
 // Units: desktop has 12 columns, mobile 6 (65px each on the 390px canvas).
 // Rows are half a column tall on both, so a cell [x, y, w, h] is
 // w columns wide and h/2 columns tall: h = 2w is square, h = 3w is 2:3.
-// Every cell is portrait or square (mobile A's full-width cell is a square).
+// Every cell is portrait or square.
 //
 // Rules the patterns were checked against (see README → "Feed mosaic"):
 // flush cells, one dominant cell (never top-left, where the home hero is),
@@ -40,8 +40,9 @@ const desktopC: Pattern = {
 };
 
 const mobile: Pattern[] = [
-  // A: cover top-left, bricks beside it, a full-width square, three narrow columns
-  { h: 38, cells: [[0, 0, 3, 8], [3, 0, 3, 6], [3, 6, 3, 8], [0, 8, 3, 6], [0, 14, 6, 12], [0, 26, 2, 6], [2, 26, 2, 4], [4, 26, 2, 6], [2, 30, 2, 4], [0, 32, 2, 6], [4, 32, 2, 6], [2, 34, 2, 4]] },
+  // A: cover top-left, bricks beside it, a full-width 6:7 cell (390×455 at 390px;
+  // it was a square, which left 25% of the width empty around 3:4 photos), three narrow columns
+  { h: 40, cells: [[0, 0, 3, 8], [3, 0, 3, 6], [3, 6, 3, 8], [0, 8, 3, 6], [0, 14, 6, 14], [0, 28, 2, 6], [2, 28, 2, 4], [4, 28, 2, 6], [2, 32, 2, 4], [0, 34, 2, 6], [4, 34, 2, 6], [2, 36, 2, 4]] },
   // B: tall cell top-right, dominant lower-left
   { h: 29, cells: [[0, 0, 2, 4], [2, 0, 4, 10], [0, 4, 2, 5], [0, 9, 2, 4], [2, 10, 2, 4], [4, 10, 2, 5], [0, 13, 2, 5], [2, 14, 2, 4], [4, 15, 2, 5], [0, 18, 4, 11], [4, 20, 2, 4], [4, 24, 2, 5]] },
   // C: big cells zig-zag left, right, right
@@ -68,7 +69,7 @@ const shortMobile: Cell[][] = [
   [],
   [[1, 0, 4, 8]],
   [[0, 0, 3, 8], [3, 0, 3, 8]],
-  [[0, 0, 3, 8], [3, 0, 3, 8], [0, 8, 6, 12]],
+  [[0, 0, 3, 8], [3, 0, 3, 8], [0, 8, 6, 14]],
   mobile[0].cells.slice(0, 4),
   mobile[0].cells.slice(0, 5),
 ];

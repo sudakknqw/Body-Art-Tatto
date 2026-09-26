@@ -63,16 +63,18 @@ class ContentError extends Error {
 const contentWarning = (file: string, message: string) =>
   console.warn(`\n  ⚠ Content warning in src/content/${file}\n    ${message}\n`);
 
-const photos = import.meta.glob<ImageMetadata>('../images/pieces/*.{jpg,jpeg,png,webp,avif}', {
+// Photos live in one folder per style, e.g. src/images/pieces/1 Blackwork/Blackwork1.jpg;
+// pieces.json names them by that path ("1 Blackwork/Blackwork1.jpg").
+const photos = import.meta.glob<ImageMetadata>('../images/pieces/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG}', {
   eager: true,
   import: 'default',
 });
-const photoByFile = new Map(Object.entries(photos).map(([path, img]) => [path.split('/').pop()!, img]));
+const photoByPath = new Map(Object.entries(photos).map(([path, img]) => [path.slice('../images/pieces/'.length), img]));
 
 function findPhoto(file: string, where: string): ImageMetadata {
-  const img = photoByFile.get(file);
+  const img = photoByPath.get(file);
   if (!img) {
-    throw new ContentError('pieces.json', `${where} points to "${file}", but there is no such file in src/images/pieces/.`);
+    throw new ContentError('pieces.json', `${where} points to "${file}", but there is no such file in src/images/pieces/ (the path includes the style folder).`);
   }
   return img;
 }

@@ -1,50 +1,50 @@
 [
   {
-    "slug": "style-1",
-    "name": "[STYLE 1 NAME]",
-    "description": "[STYLE 1: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "blackwork",
+    "name": "Blackwork",
+    "description": "[Blackwork: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-01"
+    "coverPiece": "blackwork"
   },
   {
-    "slug": "style-2",
-    "name": "[STYLE 2 NAME]",
-    "description": "[STYLE 2: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "ornamental",
+    "name": "Ornamental",
+    "description": "[Ornamental: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-04"
+    "coverPiece": "ornamental"
   },
   {
-    "slug": "style-3",
-    "name": "[STYLE 3 NAME]",
-    "description": "[STYLE 3: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "colorillustrative",
+    "name": "ColorIllustrative",
+    "description": "[ColorIllustrative: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-06"
+    "coverPiece": "colorillustrative"
   },
   {
-    "slug": "style-4",
-    "name": "[STYLE 4 NAME]",
-    "description": "[STYLE 4: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "realism",
+    "name": "Realism",
+    "description": "[Realism: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-08"
+    "coverPiece": "realism"
   },
   {
-    "slug": "style-5",
-    "name": "[STYLE 5 NAME]",
-    "description": "[STYLE 5: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "thaibuddhist",
+    "name": "ThaiBuddhist",
+    "description": "[ThaiBuddhist: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-10"
+    "coverPiece": "thaibuddhist"
   },
   {
-    "slug": "style-6",
-    "name": "[STYLE 6 NAME]",
-    "description": "[STYLE 6: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "fine-line",
+    "name": "Fine Line",
+    "description": "[Fine Line: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
-    "coverPiece": "piece-11"
+    "coverPiece": "fine-line"
   }
 ]

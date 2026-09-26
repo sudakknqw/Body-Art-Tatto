@@ -23,12 +23,12 @@ npm run check:html # validate the built HTML
 | `src/content/pieces.json` | Every tattoo shown on the site |
 | `src/content/copy.json` | Button labels, page titles, Info and Aftercare text |
 | `src/content/*.th.json` | Thai versions of the four files above — not there yet; see "Thai pages" |
-| `src/images/pieces/` | Tattoo photos (originals; the build makes the small versions) |
+| `src/images/pieces/` | Tattoo photos, one folder per style: `1 Blackwork/`, `2 Ornamental/`… (originals; the build makes the small versions) |
 | `src/scripts/site.ts` | Everything that runs in the browser: page changes without reloads (Astro ClientRouter), transitions, "Show more". The site works fully without it. |
 
 ## Add a piece
 
-1. Put the photo in `src/images/pieces/`, e.g. `koi-forearm.jpg`. Use the original file, at least 1600 px wide.
+1. Put the photo in its style's folder in `src/images/pieces/`, e.g. `3 Japanese/koi-forearm.jpg`. Use the original file, at least 1600 px wide.
 2. Add an entry to `src/content/pieces.json` (copy an existing one and change it):
 
 ```json
@@ -36,7 +36,7 @@ npm run check:html # validate the built HTML
   "slug": "koi-forearm",
   "name": "Koi on forearm",
   "style": "japanese",
-  "image": "koi-forearm.jpg",
+  "image": "3 Japanese/koi-forearm.jpg",
   "imageDetail": "",
   "imageHealed": "",
   "alt": "Red and black koi swimming up the inner forearm",
@@ -52,6 +52,7 @@ npm run check:html # validate the built HTML
 
 - `slug` becomes the address: `/work/koi-forearm/`. Lowercase, dashes, no spaces, never reused.
 - `style` must be a `slug` from `styles.json`.
+- `image` is the path inside `src/images/pieces/`, folder included. `imageDetail` / `imageHealed` the same.
 - `alt` is required: say what the tattoo shows and where it is.
 - `weight`: 3 = large in the grid, 2 = medium, 1 = small (default).
 - `imageDetail` / `imageHealed`: optional extra photos; leave `""` if none.
@@ -91,7 +92,9 @@ A style or piece without a Thai entry is left out of the Thai pages (the build s
 
 ## Placeholders
 
-Every `[BRACKETED]` value is waiting for real content. The build prints how many are left. `CONTENT.md` lists what to ask the studio for. The photos in `src/images/pieces/` are solid-colour stand-ins made by `npm run placeholders` (it only creates files that are missing; it never overwrites real photos). Delete them once real photos arrive.
+Every `[BRACKETED]` value is waiting for real content. The build prints how many are left. `CONTENT.md` lists what to ask the studio for. The photos in `src/images/pieces/` are real; `npm run placeholders` only makes solid-colour stand-ins for images that `pieces.json` names but that don't exist yet (it never overwrites a photo).
+
+The first build after adding many photos is slow (72 photos: about 6 minutes), because every photo is encoded in 5 widths × 3 formats. Later builds reuse `node_modules/.astro` and take seconds.
 
 ## Deploy (Netlify)
 
