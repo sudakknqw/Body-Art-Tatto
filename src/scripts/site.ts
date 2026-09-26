@@ -273,14 +273,19 @@ const teardown = () => {
 /** Fade each photo in as it arrives; photos already loaded are left alone. */
 function fadeInPhotos() {
   if (!motion) return;
-  document.querySelectorAll<HTMLImageElement>('.photo img').forEach((img) => {
-    // The feed's cover is where the tile transition lands: never hide it.
-    if (img.complete || img.closest('.is-cover')) return;
-    img.classList.add('is-pending');
-    const show = () => requestAnimationFrame(() => img.classList.remove('is-pending'));
-    img.addEventListener('load', () => img.decode().then(show, show), { once: true });
-    img.addEventListener('error', show, { once: true });
-  });
+  // The feed's cover is where the tile transition lands: never hide it.
+  const waiting = [...document.querySelectorAll<HTMLImageElement>('.photo img')].filter((img) => !img.complete && !img.closest('.is-cover'));
+  // Decide a frame later: after a page swap, photos already in the cache can
+  // still report `complete = false` for a moment, and must not fade again.
+  requestAnimationFrame(() =>
+    waiting.forEach((img) => {
+      if (img.complete) return;
+      img.classList.add('is-pending');
+      const show = () => requestAnimationFrame(() => img.classList.remove('is-pending'));
+      img.addEventListener('load', () => img.decode().then(show, show), { once: true });
+      img.addEventListener('error', show, { once: true });
+    }),
+  );
 }
 
 /** Feed: pieces fade up as they scroll in; "Show more" reveals the next 12. */

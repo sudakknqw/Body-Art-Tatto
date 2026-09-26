@@ -1,55 +1,62 @@
-# What we need from the studio
+# What we need from you
 
-Send everything in one WhatsApp chat or one Google Drive folder. Plain text is fine — we'll put it into the site.
+Send everything in one WhatsApp chat or one Google Drive folder.
+Short answers are fine. We put everything into the website.
 
-## 1. Studio details
+## 1. Photos of your tattoos
 
-- Artist's name, as it should appear on the site
-- 2–3 sentences about the artist: years tattooing, favourite styles, languages spoken
-- One short line for the top of the home page (e.g. "Custom tattoos by one artist, drawn for you in Ari")
-- Full address, and the Google Maps link to the studio
-- Opening hours for each day (e.g. Mon–Sat 12:00–20:00, Sun closed)
-- Phone number, WhatsApp number, Instagram handle, LINE ID (if any)
-- Website domain you want (e.g. bodyarttattoo.com)
-- Prices: minimum price, hourly rate, deposit amount and rule (e.g. "1000 THB, non-refundable, counts towards the price")
+- **How many:** 4 to 8 styles, and **at least 6 photos for each style**. 50 photos in total is ideal.
+- **Which way:** **vertical** (portrait), like a normal phone photo. Please no horizontal photos.
+- **Size:** the original file from your phone or camera, **at least 1600 pixels wide**.
+  Not a screenshot. Not saved from Instagram or LINE (they make photos small).
+- **The photo:** the whole tattoo inside the photo, with a little space around it. Good light, plain background.
+- **Extra (not required):** a close-up photo, and a photo of the tattoo when it is healed.
 
-## 2. Styles (4 to 8)
+## 2. For every photo, write this
 
-For each style you want as a tile on the home page:
+| | Example | Max length |
+|---|---|---|
+| Name of the piece | Koi on forearm | 40 letters |
+| Style | Japanese | |
+| What the photo shows, and where on the body | Red and black koi on the inner forearm | 1 sentence |
+| Body part | Forearm | |
+| Size in cm | 18 | |
+| Sessions and hours | 2 sessions, 7 hours | |
+| Price in THB (you can skip this) | 9000 | |
+| 1–2 sentences from you about the piece | The client wanted movement, so the fish follows the wrist. | 2 sentences |
+| Show it big or small on the site? | big / normal / small | |
 
-- Name (e.g. Fine line, Blackwork, Japanese)
-- 2 sentences: how it looks on skin, how it ages, who it suits
-- Price from (THB) and typical hours
+For each style, tell us **which photo is the cover** (the photo on the home page).
 
-## 3. Photos of your work
+## 3. Your styles (4 to 8)
 
-- **At least 24 pieces, ideally 50.** At least 3 per style.
-- **Original files**, not screenshots and not photos saved from Instagram (Instagram shrinks them).
-- At least **1600 px wide**; phone camera originals are perfect. Vertical is best.
-- Tattoo fully in frame — we never crop the edges off.
-- Optional, but great: a close-up **detail** shot and a **healed** photo of the same piece.
+For each style:
 
-For **each** photo, a few words:
+- **Name**, short — up to **25 letters** (e.g. Fine line, Blackwork, Japanese)
+- **2 short sentences**, up to **200 letters** in total: how it looks, how it ages, who it is for
+- **Price from** (THB) and **usual hours**
 
-| What | Example |
-|---|---|
-| Name | Koi on forearm |
-| Style | Japanese |
-| What it shows and where | Red and black koi swimming up the inner forearm |
-| Placement | Forearm |
-| Size (cm) | 18 |
-| Sessions / hours | 2 sessions, 7 hours |
-| Price (THB), optional | 9000 |
-| 1–2 sentences from the artist | The client wanted movement, so the koi was drawn to follow the wrist |
-| How prominent (1–3) | 3 = show big, 1 = small |
+Please keep to these lengths. If the text is longer, the website cannot be built until it is shorter.
 
-Also tell us which photo should be the **cover** of each style tile.
+## 4. About the studio
 
-## 4. Text for the Info and Aftercare pages
+- Your name, as it should be on the website
+- 2–3 sentences about you: how many years you tattoo, your favourite styles, which languages you speak
+- One short line for the top of the home page (e.g. "Custom tattoos by one artist, in Ari, Bangkok")
+- **WhatsApp number** — this is the most important one, every "Book" button uses it
+- Phone number, Instagram name, LINE ID (skip what you don't have)
+- Address, and the link to the studio on Google Maps
+- Opening hours for every day (e.g. Mon–Sat 12:00–20:00, Sunday closed)
+- Minimum price, price per hour, deposit (how much, and can it be returned?)
+- The website address you want (e.g. bodyarttattoo.com)
 
-- How a session works, in 4 short steps (message → quote & deposit → drawing → session day)
-- Your aftercare instructions (wrap, washing, cream, sun and swimming, when to message you)
+## 5. Two small pages
 
-## 5. Thai version (optional)
+- **How a session works**, in 4 short steps: message → price and deposit → drawing → tattoo day
+- **Aftercare**: your instructions (bandage, washing, cream, sun and swimming, when to message you)
 
-If you want the site in Thai, send the Thai text for everything above, written or checked by a Thai speaker. We don't machine-translate. Until the Thai text arrives, the site is English only.
+## 6. Thai (only if you want the site in Thai too)
+
+The same text in Thai, written or checked by a Thai person. We do not use machine translation.
+Keep the same lengths as above — Thai text is often longer, and long text does not fit on the phone screen.
+Until the Thai text arrives, the website is in English only.
