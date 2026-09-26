@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import { site as getSite, fill, phoneLink, whatsappHref, type Lang } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const site = getSite(Astro.props.lang);
+const { studio, copy, styles, prefix } = site;
+const t = copy.infoPage;
+const title = fill(copy.titles.info, { name: studio.name });
+const description = fill(copy.descriptions.info, {
+  min: studio.priceMinimum,
+  hourly: studio.priceHourly,
+  deposit: studio.deposit,
+  bts: studio.bts,
+  hours: studio.hours,
+});
+const phone = phoneLink(studio);
+---
+
+<Base site={site} title={title} description={description} current="info">
+  <main class="page wrap">
+    <h1>{t.heading}</h1>
+
+    <section>
+      <h2>{t.pricesHeading}</h2>
+      <dl class="facts">
+        <div><dt>{t.minimum}</dt><dd>{studio.priceMinimum} {copy.thb}</dd></div>
+        <div><dt>{t.hourly}</dt><dd>{studio.priceHourly} {copy.thb}</dd></div>
+        <div><dt>{t.deposit}</dt><dd>{studio.deposit}</dd></div>
+      </dl>
+    </section>
+
+    <section>
+      <h2>{t.stylesHeading}</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"><span class="visually-hidden">{copy.nav.work}</span></th>
+            <th scope="col">{copy.priceFrom}</th>
+            <th scope="col">{copy.typicalHours}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {styles.map((s) => (
+            <tr>
+              <th scope="row"><a href={`${prefix}/style/${s.slug}/`}>{s.name}</a></th>
+              <td>{s.priceFrom} {copy.thb}</td>
+              <td>{s.typicalHours} {copy.hoursShort}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>{t.processHeading}</h2>
+      <ol class="steps">
+        {t.process.map((step) => (
+          <li>
+            <h3>{step.title}</h3>
+            <p class="muted">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section>
+      <h2>{t.visitHeading}</h2>
+      <dl class="facts">
+        <div><dt>{t.addressLabel}</dt><dd>{studio.address}<br /><span class="muted">{studio.bts}</span></dd></div>
+        {studio.hours && <div><dt>{t.hoursLabel}</dt><dd>{studio.hours}</dd></div>}
+      </dl>
+      <p class="actions">
+        <a class="btn btn--ghost" href={studio.mapUrl}>{copy.openMap}</a>
+        {studio.phone && <a class="btn btn--ghost" href={phone.href}>{phone.text}</a>}
+        <a class="btn" href={whatsappHref(studio, copy.waGreeting)}>{copy.book}</a>
+      </p>
+    </section>
+  </main>
+</Base>

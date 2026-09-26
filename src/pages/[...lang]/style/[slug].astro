@@ -1,0 +1,12 @@
+---
+import View from '../../../views/StyleFeed.astro';
+import { sites, langParam } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return sites.flatMap((s) =>
+    s.styles.map((x) => ({ params: { lang: langParam(s.lang), slug: x.slug }, props: { lang: s.lang } })),
+  );
+}
+---
+
+<View lang={Astro.props.lang} slug={Astro.params.slug} />

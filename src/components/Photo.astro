@@ -1,0 +1,43 @@
+---
+// Responsive <picture>: AVIF (q72) + WebP (q78) + JPEG fallback,
+// 400/800/1200/1600w, explicit width/height so nothing shifts.
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  sizes: string;
+  eager?: boolean;
+  fit?: 'cover' | 'contain';
+}
+
+const { src, alt, sizes, eager = false, fit = 'cover' } = Astro.props;
+const all = [400, 800, 1200, 1600];
+const widths = all.filter((w) => w <= src.width);
+// A photo smaller than 1600px also offers its own full width.
+if (src.width < 1600 && !widths.includes(src.width)) widths.push(src.width);
+
+const [avif, webp, jpg] = await Promise.all([
+  getImage({ src, widths, format: 'avif', quality: 72 }),
+  getImage({ src, widths, format: 'webp', quality: 78 }),
+  getImage({ src, widths, format: 'jpg', quality: 80 }),
+]);
+const fallback = await getImage({ src, width: Math.min(800, src.width), format: 'jpg', quality: 80 });
+---
+
+<picture class:list={['photo', `photo--${fit}`]}>
+  <source type="image/avif" srcset={avif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" srcset={webp.srcSet.attribute} sizes={sizes} />
+  <img
+    src={fallback.src}
+    srcset={jpg.srcSet.attribute}
+    sizes={sizes}
+    width={src.width}
+    height={src.height}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding={eager ? 'auto' : 'async'}
+    fetchpriority={eager ? 'high' : undefined}
+  />
+</picture>

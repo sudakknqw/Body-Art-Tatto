@@ -1,0 +1,421 @@
+/* Fonts: declared in Base.astro, in a <style> of their own that stays the same
+   on every page, so page changes never re-load them. */
+
+/* ---------- Tokens ----------
+   Base = light. Dark via system preference or data-theme="dark".
+   The head script sets data-theme="dark" unless the visitor picked light,
+   so dark is the default; the media query is the no-JS path.
+   --text-caption (dark) is #858075, not #6e6a62: the original measured
+   3.7:1 on --bg and failed WCAG AA; #858075 measures 5.0:1. */
+:root {
+  color-scheme: light;
+  --bg: #f4f2ed;
+  --text: #16140f;
+  --text-muted: #5d584e;
+  --text-caption: #6d6759;
+  --line: #ddd7ca;
+  --border: #c6bfae;
+  --accent: #8a6a24;
+  --on-accent: #f7f5f0;
+  --tile-1: #e3ded1;
+  --tile-2: #d7d0c0;
+  --tile-3: #ebe6db;
+  --tile-4: #e0dacd;
+  --tile-5: #e7e2d6;
+  --tile-6: #dbd4c5;
+  --gap: 1px;
+  --seam: var(--line);
+  --bar-shadow: 0 -4px 16px rgb(22 20 15 / 0.08);
+
+  --s2: 2px; --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px;
+  --s18: 18px; --s22: 22px; --s30: 30px; --s40: 40px; --s56: 56px;
+  --header-h: 56px;
+  --bar-h: 80px;
+  --photo-col: 560px; /* piece page photo column, desktop (PHOTO_COL in src/lib/layout.ts) */
+  --font: 'Space Grotesk', sans-serif;
+
+  /* Text and controls that sit on photos: the same in both themes */
+  --on-photo: #f4f1ea;
+  --on-photo-muted: #d9d4c9;
+  --on-photo-focus: #d8cfa8;
+  --photo-scrim: rgb(10 10 9 / 0.66);
+}
+/* Breakpoints (media queries can't use variables): 768px tablet, 1024px desktop,
+   1280px wide — BP in src/lib/layout.ts. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0a0a09;
+    --text: #f4f1ea;
+    --text-muted: #b0aba1;
+    --text-caption: #858075;
+    --line: #232120;
+    --border: #33312d;
+    --accent: #d8cfa8;
+    --on-accent: #0a0a09;
+    --tile-1: #1e1d1a;
+    --tile-2: #2b2926;
+    --tile-3: #151412;
+    --tile-4: #232120;
+    --tile-5: #171614;
+    --tile-6: #262421;
+    --gap: 2px;
+    --seam: var(--bg);
+    --bar-shadow: none;
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a0a09;
+  --text: #f4f1ea;
+  --text-muted: #b0aba1;
+  --text-caption: #858075;
+  --line: #232120;
+  --border: #33312d;
+  --accent: #d8cfa8;
+  --on-accent: #0a0a09;
+  --tile-1: #1e1d1a;
+  --tile-2: #2b2926;
+  --tile-3: #151412;
+  --tile-4: #232120;
+  --tile-5: #171614;
+  --tile-6: #262421;
+  --gap: 2px;
+  --seam: var(--bg);
+  --bar-shadow: none;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+main { flex: 1 0 auto; }
+img, picture { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+p { max-width: 62ch; }
+button { font: inherit; color: inherit; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Photos ---------- */
+.photo { display: contents; }
+.photo img { width: 100%; height: 100%; }
+.photo--cover img { object-fit: cover; }
+.photo--contain img { object-fit: contain; }
+
+/* ---------- Page wrapper ---------- */
+.wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--s16);
+}
+@media (min-width: 768px) { .wrap { padding-inline: var(--s40); } }
+
+/* ---------- Type helpers ---------- */
+.eyebrow {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.muted { color: var(--text-muted); }
+.caption { color: var(--text-caption); font-size: 13px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s8);
+  min-height: 48px;
+  padding: var(--s12) var(--s22);
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid var(--accent);
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn--ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn--block { display: flex; width: 100%; }
+
+/* ---------- Mobile booking bar ---------- */
+.book-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 20;
+  padding: var(--s12) var(--s16) calc(16px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  box-shadow: var(--bar-shadow);
+  text-align: center;
+}
+.book-bar .caption { margin: var(--s4) auto 0; }
+body { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom)); }
+body.has-bar-caption { --bar-h: 104px; }
+@media (min-width: 1024px) {
+  .book-bar { display: none; }
+  body, body.has-bar-caption { padding-bottom: 0; }
+}
+
+/* ---------- JS-only controls ---------- */
+.js-only { display: none !important; }
+.js .js-only { display: inline-flex !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+  /* Page changes are instant too: the router's view transition has nothing to animate */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ---------- Motion ----------
+   Every rule that moves or fades lives inside no-preference, so with
+   reduced motion the site is exactly as static as before.
+   Only opacity and transform animate. Enter: 0.2,0,0,1. Leave: 0.4,0,1,1.
+   120ms state changes · 200ms entrances · 320ms page transitions. */
+html.no-transition *,
+html.no-transition *::before,
+html.no-transition *::after { transition: none !important; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Page transitions. With JavaScript, Astro's ClientRouter runs them inside one
+     document (src/scripts/site.ts). This rule covers full page loads (JavaScript
+     off), which keep the same cross-fade as before. */
+  @view-transition { navigation: auto; }
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  ::view-transition-old(root) { animation: 320ms cubic-bezier(0.4, 0, 1, 1) both vt-out; }
+  ::view-transition-new(root) { animation: 320ms cubic-bezier(0.2, 0, 0, 1) both vt-in; }
+  /* Prev/next between pieces and the theme switch: shorter */
+  html[data-vt]::view-transition-group(*),
+  html[data-vt]::view-transition-old(*),
+  html[data-vt]::view-transition-new(*) { animation-duration: 200ms; }
+  @keyframes vt-in { from { opacity: 0; } }
+  @keyframes vt-out { to { opacity: 0; } }
+
+  /* Tile → feed (and back). Home tiles are tile-<slug>; the opened tile's photo
+     and the feed's cover photo share style-cover-<slug> (site.ts names the tile
+     as the page swaps; the cover's comes from --cover-vt in StyleFeed.astro). */
+  .tile { view-transition-name: var(--tile-vt); view-transition-class: home-tile; }
+  .tile img, .is-cover img { view-transition-class: style-cover; }
+  .is-cover img { view-transition-name: var(--cover-vt); }
+
+  /* The other tiles slide 32–48px away from the opened one (--dx/--dy are
+     worked out from the tiles' positions as the page swaps) and fade; coming back
+     they slide in from there. */
+  ::view-transition-old(.home-tile) { animation: vt-tile-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+  ::view-transition-new(.home-tile) { animation: vt-tile-in 200ms cubic-bezier(0.2, 0, 0, 1) both; }
+  @keyframes vt-tile-out { to { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, 0px)); } }
+  @keyframes vt-tile-in { from { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, 0px)); } }
+
+  /* The photo: one object whose frame changes shape. Both snapshots are cropped
+     to the moving frame (cover), never stretched. The full feed photo leads;
+     the tile's crop only shows while the two frames still differ. */
+  /* Above the tiles: on the way back they are new-only groups, which the
+     browser paints after (over) the photo unless told otherwise. */
+  ::view-transition-group(.style-cover) { z-index: 1; }
+  ::view-transition-old(.style-cover),
+  ::view-transition-new(.style-cover) {
+    height: 100%;
+    object-fit: cover;
+    overflow: clip; /* <img> clips its cover crop by default; these pseudo-elements don't */
+    mix-blend-mode: normal;
+  }
+  html[data-page='feed']::view-transition-new(.style-cover) { animation: none; }
+  html[data-page='feed']::view-transition-old(.style-cover) { animation: vt-out 120ms 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+  html[data-page='home']::view-transition-old(.style-cover) { animation: none; }
+  html[data-page='home']::view-transition-new(.style-cover) { animation: vt-in 120ms 200ms cubic-bezier(0.2, 0, 0, 1) both; }
+  /* The opened tile's label stays above the photo: out with the tiles, back in as it lands */
+  ::view-transition-group(style-label) { z-index: 2; }
+  ::view-transition-old(style-label) { animation: vt-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+  ::view-transition-new(style-label) { animation: vt-in 200ms 120ms cubic-bezier(0.2, 0, 0, 1) both; }
+  /* Only one end on screen: a plain fade, never a flight */
+  html[data-page]::view-transition-old(.style-cover):only-child { animation: vt-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+  html[data-page]::view-transition-new(.style-cover):only-child { animation: vt-in 200ms cubic-bezier(0.2, 0, 0, 1) both; }
+
+  /* The site header is the same on both pages, so it simply stays put
+     (not on piece pages, where it sits elsewhere on desktop). */
+  html:not([data-page='piece']) .site-header { view-transition-name: site-header; }
+  /* The home page copy leaves together with the tiles */
+  html[data-from='home']::view-transition-old(root) { animation-duration: 200ms; }
+
+  /* The feed's own header follows once the photo has settled */
+  html[data-from='home'] .style-head .back { view-transition-name: feed-back; }
+  html[data-from='home'] .style-head h1 { view-transition-name: feed-title; }
+  html[data-from='home'] .style-head .desc { view-transition-name: feed-desc; }
+  html[data-from='home'] .style-head .figures { view-transition-name: feed-figures; }
+  ::view-transition-new(feed-back) { animation: vt-in 200ms 120ms cubic-bezier(0.2, 0, 0, 1) both; }
+  ::view-transition-new(feed-title) { animation: vt-in 200ms 140ms cubic-bezier(0.2, 0, 0, 1) both; }
+  ::view-transition-new(feed-desc) { animation: vt-in 200ms 160ms cubic-bezier(0.2, 0, 0, 1) both; }
+  ::view-transition-new(feed-figures) { animation: vt-in 200ms 180ms cubic-bezier(0.2, 0, 0, 1) both; }
+
+  /* Photos fade in over their --tile-* placeholder as they arrive */
+  .photo img { transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1); }
+  .photo img.is-pending { opacity: 0; transition: none; }
+
+  /* Buttons */
+  .btn { transition: opacity 120ms cubic-bezier(0.4, 0, 1, 1); }
+  .btn:active { opacity: 0.9; }
+
+  /* Mobile booking bar. Body padding stays constant, so nothing reflows. */
+  .book-bar {
+    view-transition-name: book-bar;
+    transition: transform 200ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .book-bar.is-away {
+    transform: translateY(calc(100% + 24px));
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+  .book-bar:focus-within { transform: none; }
+
+  /* Feed entrance (classes set by the feed script) */
+  .reveal { transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1), transform 200ms cubic-bezier(0.2, 0, 0, 1); }
+  .reveal.is-below { opacity: 0; transform: translateY(8px); transition: none; }
+  .btn.is-leaving { opacity: 0; transition: opacity 120ms cubic-bezier(0.4, 0, 1, 1); }
+
+  /* Photo tiles: the image moves inside a fixed frame */
+  .tile-link { overflow: hidden; }
+  @media (hover: hover) {
+    .tile-link::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+    }
+    .tile-link img {
+      transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1), transform 200ms cubic-bezier(0.2, 0, 0, 1);
+    }
+    .tile-link:hover img { transform: scale(1.03); }
+    .tile-link:hover::after { opacity: 0.08; }
+
+    /* Text links: the underline grows from the left */
+    :is(.site-footer a, .rating a, .text-link, .table a) { position: relative; text-decoration: none; }
+    :is(.site-footer a, .rating a, .text-link, .table a)::before,
+    :is(.site-footer a, .rating a, .text-link, .table a)::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(50% + 0.62em);
+      height: 1px;
+      background: currentColor;
+      pointer-events: none;
+    }
+    :is(.site-footer a, .rating a, .text-link, .table a)::before { opacity: 0.35; }
+    :is(.site-footer a, .rating a, .text-link, .table a)::after {
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 120ms cubic-bezier(0.2, 0, 0, 1);
+    }
+    :is(.site-footer a, .rating a, .text-link, .table a):hover::after { transform: scaleX(1); }
+  }
+  @media (hover: none) {
+    .tile-link { transition: opacity 120ms cubic-bezier(0.4, 0, 1, 1); }
+    .tile-link:active { opacity: 0.85; }
+  }
+}
+
+/* Piece pages: on desktop the header floats over the right-hand column
+   so the photo can use the full height of the viewport. */
+@media (min-width: 1024px) {
+  body.header-overlay .site-header {
+    position: absolute;
+    top: 0;
+    left: var(--photo-col);
+    right: 0;
+    background: transparent;
+    border-bottom: 0;
+  }
+  /* The column has its own booking button. */
+  body.header-overlay .header-book { display: none; }
+}
+/* The right-hand column is too narrow for the inline nav below 1280px. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  body.header-overlay .nav-inline { display: none; }
+  body.header-overlay .menu { display: block; }
+}
+
+/* ---------- Text pages (artist, info, aftercare) ---------- */
+.page { padding-top: var(--s30); padding-bottom: var(--s56); }
+.page h1 { font-size: 34px; margin-top: var(--s8); }
+.page > h2, .page section > h2 { font-size: 22px; margin-top: var(--s40); }
+.page .lead { font-size: 18px; margin-top: var(--s16); color: var(--text-muted); }
+.page p { margin-top: var(--s12); }
+.text-link { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 3px; }
+.facts { display: grid; gap: var(--s16); margin-top: var(--s16); }
+.facts dt { font-size: 13px; color: var(--text-caption); }
+.facts dd { font-size: 18px; }
+.table { width: 100%; border-collapse: collapse; margin-top: var(--s16); font-size: 15px; }
+.table th, .table td {
+  text-align: left;
+  padding: var(--s12) var(--s8) var(--s12) 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 400;
+}
+.table thead th { font-size: 13px; color: var(--text-caption); }
+.table a { display: inline-flex; align-items: center; min-height: 44px; }
+.steps { list-style: none; padding: 0; counter-reset: step; margin-top: var(--s16); }
+.steps li {
+  counter-increment: step;
+  position: relative;
+  padding: var(--s18) 0 var(--s18) var(--s40);
+  border-top: 1px solid var(--line);
+}
+.steps li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: var(--s18);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+}
+.steps h2, .steps h3 { font-size: 18px; margin: 0; }
+.steps p { margin-top: var(--s4); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--s8); margin-top: var(--s22); }
+@media (min-width: 768px) {
+  .page { padding-top: var(--s56); }
+  .page h1 { font-size: 42px; }
+  .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

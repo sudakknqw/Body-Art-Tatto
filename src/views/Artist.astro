@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import { BP } from '../lib/layout';
+import { site as getSite, fill, ratingText, type Lang } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const site = getSite(Astro.props.lang);
+const { studio, copy, prefix } = site;
+const recent = [...site.pieces].sort((a, b) => b.weight - a.weight).slice(0, 6);
+const title = fill(copy.titles.artist, { artist: studio.artist, name: studio.name });
+---
+
+<Base site={site} title={title} description={studio.about} image={recent[0]?.photo} imageAlt={recent[0]?.alt} current="artist">
+  <main class="page wrap">
+    <p class="eyebrow">{copy.artistPage.heading}</p>
+    <h1>{studio.artist}</h1>
+    <p class="lead">{studio.about}</p>
+    <p>
+      <a class="text-link" href={studio.googleMapsReviewUrl}>
+        {ratingText(site)} — {copy.artistPage.reviewsLink}
+      </a>
+    </p>
+
+    <h2>{copy.artistPage.workHeading}</h2>
+    <ul class="grid">
+      {recent.map((p, i) => (
+        <li style={`background:var(--tile-${(i % 6) + 1})`}>
+          <a class="tile-link" href={`${prefix}/work/${p.slug}/`} data-vt-photo={p.slug}>
+            <Photo src={p.photo} alt={p.alt} fit="contain" sizes={`(min-width: 1200px) 373px, (min-width: ${BP.tablet}px) 33vw, 50vw`} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>
+
+<style>
+  .grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+    margin-top: var(--s22);
+  }
+  .grid li { aspect-ratio: 3 / 4; position: relative; }
+  .grid a { position: absolute; inset: 0; }
+  .grid a:focus-visible { outline-offset: -2px; }
+  .grid :global(img) { position: absolute; inset: 0; }
+  @media (min-width: 768px) {
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

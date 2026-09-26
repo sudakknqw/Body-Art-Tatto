@@ -1,0 +1,173 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import { site as getSite, coverOf, piecesOf, fill, ratingText, type Lang } from '../lib/content';
+import { layouts, tileSizes, MOBILE_WIDTH } from '../lib/mosaic';
+
+interface Props {
+  lang: Lang;
+}
+const site = getSite(Astro.props.lang);
+const { studio, styles, copy, prefix } = site;
+const layout = layouts[styles.length];
+
+const pct = (n: number, of: number) => `${+((n / of) * 100).toFixed(4)}%`;
+const tiles = styles.map((style, i) => {
+  const [c1, c2, r1, r2] = layout.desktop[i];
+  const [x, y, w, h] = layout.mobile.tiles[i];
+  const count = piecesOf(site, style.slug).length;
+  return {
+    style,
+    cover: coverOf(site, style),
+    count,
+    vars: [
+      `--col:${c1}/${c2}`,
+      `--row:${r1}/${r2}`,
+      `--x:${pct(x, MOBILE_WIDTH)}`,
+      `--y:${pct(y, layout.mobile.height)}`,
+      `--w:${pct(w, MOBILE_WIDTH)}`,
+      `--h:${pct(h, layout.mobile.height)}`,
+      `--tile-vt:tile-${style.slug}`,
+      `background:var(--tile-${(i % 6) + 1})`,
+    ].join(';'),
+    sizes: tileSizes(i, styles.length),
+  };
+});
+
+const title = fill(copy.titles.home, { name: studio.name, tagline: studio.tagline });
+const description = fill(copy.descriptions.home, {
+  tagline: studio.tagline,
+  rating: studio.googleRating.toFixed(1),
+  count: studio.googleReviews,
+  styles: styles.map((s) => s.name).join(', '),
+});
+---
+
+<Base page="home" site={site} title={title} description={description} current="work">
+  <main class="home">
+    <div class="intro">
+      <h1>{copy.homeLine}</h1>
+      <p class="rating">
+        <a href={studio.googleMapsReviewUrl}>
+          <span aria-hidden="true">★</span>
+          {ratingText(site)}
+        </a>
+      </p>
+    </div>
+
+    <ul class="mosaic" style={`--mobile-ratio:${MOBILE_WIDTH}/${layout.mobile.height}`}>
+      {tiles.map((t, i) => (
+        <li class:list={['tile', { 'tile--hero': i === 0 }]} style={t.vars} data-style={t.style.slug}>
+          <a class="tile-link" href={`${prefix}/style/${t.style.slug}/`}>
+            {t.cover && <Photo src={t.cover.photo} alt="" sizes={t.sizes} eager={i < 2} />}
+            <div class="label">
+              <h2>{t.style.name}</h2>
+              <span class="meta">
+                {t.count} {t.count === 1 ? copy.piece : copy.pieces}
+                {i === 0 && <> · {fill(copy.from, { price: t.style.priceFrom, thb: copy.thb })}</>}
+              </span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>
+
+<style>
+  .home { display: flex; flex-direction: column; }
+  .intro {
+    padding: var(--s18) var(--s16) var(--s16);
+    display: grid;
+    gap: var(--s4);
+  }
+  h1 { font-size: 22px; max-width: 30ch; }
+  .rating { font-size: 14px; }
+  .rating a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s8);
+    min-height: 44px;
+    color: var(--text-muted);
+    text-underline-offset: 3px;
+  }
+  .rating span { color: var(--accent); }
+
+  /* Mobile: absolutely positioned, flush tiles on a fixed-ratio canvas */
+  .mosaic {
+    list-style: none;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--mobile-ratio);
+    background: var(--seam);
+  }
+  .tile {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
+    overflow: hidden;
+    border: calc(var(--gap) / 2) solid var(--seam);
+  }
+  .tile a {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--on-photo);
+    text-decoration: none;
+  }
+  .tile a:focus-visible { outline-offset: -2px; }
+  .tile :global(img) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Scrim 1 of 2: keeps tile labels readable on any photo, in both themes */
+  .label {
+    position: absolute;
+    z-index: 1;
+    inset: auto 0 0 0;
+    padding: var(--s30) var(--s12) var(--s12);
+    background: linear-gradient(to top, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0));
+    display: grid;
+    gap: var(--s2);
+  }
+  h2 { font-size: 16px; }
+  .tile--hero h2 { font-size: 22px; }
+  .meta { font-size: 13px; color: var(--on-photo-muted); }
+
+  @media (min-width: 1024px) {
+    .home { min-height: calc(100vh - var(--header-h)); min-height: calc(100svh - var(--header-h)); }
+    .intro {
+      grid-auto-flow: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--s12) var(--s22);
+    }
+    h1 { font-size: 22px; max-width: none; }
+    .mosaic {
+      flex: 1 1 auto;
+      aspect-ratio: auto;
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: var(--gap);
+    }
+    .tile {
+      position: relative;
+      inset: auto;
+      width: auto;
+      height: auto;
+      border: 0;
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+    .label { padding: var(--s40) var(--s18) var(--s16); }
+    h2 { font-size: 20px; }
+    .tile--hero h2 { font-size: 30px; }
+    .meta { font-size: 14px; }
+  }
+</style>

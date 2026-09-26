@@ -1,0 +1,10 @@
+---
+import View from '../../views/Artist.astro';
+import { sites, langParam } from '../../lib/content';
+
+export function getStaticPaths() {
+  return sites.map((s) => ({ params: { lang: langParam(s.lang) }, props: { lang: s.lang } }));
+}
+---
+
+<View lang={Astro.props.lang} />

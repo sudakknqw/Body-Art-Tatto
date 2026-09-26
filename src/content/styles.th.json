@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "style-1",
+    "name": "[TH: STYLE 1 NAME]",
+    "description": "[TH: STYLE 1: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  },
+  {
+    "slug": "style-2",
+    "name": "[TH: STYLE 2 NAME]",
+    "description": "[TH: STYLE 2: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  },
+  {
+    "slug": "style-3",
+    "name": "[TH: STYLE 3 NAME]",
+    "description": "[TH: STYLE 3: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  },
+  {
+    "slug": "style-4",
+    "name": "[TH: STYLE 4 NAME]",
+    "description": "[TH: STYLE 4: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  },
+  {
+    "slug": "style-5",
+    "name": "[TH: STYLE 5 NAME]",
+    "description": "[TH: STYLE 5: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  },
+  {
+    "slug": "style-6",
+    "name": "[TH: STYLE 6 NAME]",
+    "description": "[TH: STYLE 6: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]"
+  }
+]

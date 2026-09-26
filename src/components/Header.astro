@@ -1,0 +1,153 @@
+---
+import type { Site } from '../lib/content';
+
+interface Props {
+  site: Site;
+  bookHref: string;
+  altLangHref: string | null;
+  current?: 'work' | 'artist' | 'info' | 'aftercare';
+}
+const { site, bookHref, altLangHref, current } = Astro.props;
+const { copy, prefix, studio } = site;
+const links = [
+  { key: 'work', href: `${prefix}/`, label: copy.nav.work },
+  { key: 'artist', href: `${prefix}/artist/`, label: copy.nav.artist },
+  { key: 'info', href: `${prefix}/info/`, label: copy.nav.info },
+  { key: 'aftercare', href: `${prefix}/aftercare/`, label: copy.nav.aftercare },
+] as const;
+const altLang = site.lang === 'en' ? { code: 'th', label: 'ไทย' } : { code: 'en', label: 'EN' };
+---
+
+<header class="site-header" transition:persist="site-header">
+  <a class="brand" href={`${prefix}/`}>{studio.name}</a>
+
+  <nav class="nav" aria-label={copy.nav.menu}>
+    <ul class="nav-inline">
+      {links.map((l) => (
+        <li><a href={l.href} aria-current={current === l.key ? "page" : undefined}>{l.label}</a></li>
+      ))}
+    </ul>
+    <details class="menu">
+      <summary aria-label={copy.nav.menu}>
+        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 6h18M2 11h18M2 16h18" stroke="currentColor" stroke-width="1.6" /></svg>
+      </summary>
+      <ul class="menu-list">
+        {links.map((l) => (
+          <li><a href={l.href} aria-current={current === l.key ? 'page' : undefined}>{l.label}</a></li>
+        ))}
+      </ul>
+    </details>
+  </nav>
+
+  <div class="tools">
+    {altLangHref && (
+      <a class="tool lang" href={altLangHref} hreflang={altLang.code} lang={altLang.code}>{altLang.label}</a>
+    )}
+    <button
+      type="button"
+      class="tool js-only"
+      data-theme-toggle
+      data-label-dark={copy.themeToDark}
+      data-label-light={copy.themeToLight}
+      aria-label={copy.themeToLight}
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor" />
+      </svg>
+    </button>
+    <a class="btn header-book" href={bookHref}>{copy.book}</a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s8);
+    height: var(--header-h);
+    padding-inline: var(--s16) var(--s4);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    position: relative;
+    z-index: 30;
+  }
+  .brand {
+    font-weight: 500;
+    font-size: 18px;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-right: auto;
+    white-space: nowrap;
+  }
+  .nav { order: 3; }
+  .tools { display: flex; align-items: center; gap: var(--s4); }
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 var(--s8);
+    background: none;
+    border: 0;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .header-book { display: none; }
+
+  /* Mobile menu: <details>, works without JS */
+  .menu summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+  }
+  .menu summary::-webkit-details-marker { display: none; }
+  .menu-list {
+    list-style: none;
+    padding: var(--s8) 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--header-h);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .menu-list a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding-inline: var(--s16);
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .menu-list a[aria-current='page'] { color: var(--accent); }
+
+  .nav-inline { display: none; }
+
+  @media (min-width: 1024px) {
+    .site-header { padding-inline: var(--s22); gap: var(--s12); }
+    .nav { order: 0; }
+    .menu { display: none; }
+    .nav-inline { display: flex; list-style: none; padding: 0; gap: var(--s4); }
+    .nav-inline a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding-inline: var(--s12);
+      font-size: 15px;
+      text-decoration: none;
+      color: var(--text-muted);
+    }
+    .nav-inline a:hover, .nav-inline a[aria-current="page"] { color: var(--text); }
+    .header-book { display: inline-flex; min-height: 44px; padding-block: var(--s8); margin-left: var(--s8); }
+  }
+</style>

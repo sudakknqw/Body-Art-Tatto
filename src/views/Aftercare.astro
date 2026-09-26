@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { site as getSite, fill, type Lang } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const site = getSite(Astro.props.lang);
+const { studio, copy } = site;
+const t = copy.aftercarePage;
+const title = fill(copy.titles.aftercare, { name: studio.name });
+const description = fill(copy.descriptions.aftercare, { name: studio.name });
+---
+
+<Base site={site} title={title} description={description} current="aftercare">
+  <main class="page wrap">
+    <h1>{t.heading}</h1>
+    <p class="lead">{t.intro}</p>
+    <ol class="steps">
+      {t.steps.map((step) => (
+        <li>
+          <h2>{step.title}</h2>
+          <p class="muted">{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </main>
+</Base>

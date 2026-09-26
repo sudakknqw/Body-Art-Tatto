@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "style-1",
+    "name": "[STYLE 1 NAME]",
+    "description": "[STYLE 1: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-01"
+  },
+  {
+    "slug": "style-2",
+    "name": "[STYLE 2 NAME]",
+    "description": "[STYLE 2: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-04"
+  },
+  {
+    "slug": "style-3",
+    "name": "[STYLE 3 NAME]",
+    "description": "[STYLE 3: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-06"
+  },
+  {
+    "slug": "style-4",
+    "name": "[STYLE 4 NAME]",
+    "description": "[STYLE 4: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-08"
+  },
+  {
+    "slug": "style-5",
+    "name": "[STYLE 5 NAME]",
+    "description": "[STYLE 5: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-10"
+  },
+  {
+    "slug": "style-6",
+    "name": "[STYLE 6 NAME]",
+    "description": "[STYLE 6: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "priceFrom": "[NUMBER]",
+    "typicalHours": "[NUMBER]",
+    "coverPiece": "piece-11"
+  }
+]

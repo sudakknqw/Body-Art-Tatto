@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "work": "Work",
+    "artist": "Artist",
+    "info": "Prices & info",
+    "aftercare": "Aftercare",
+    "menu": "Menu"
+  },
+  "themeToDark": "Switch to dark theme",
+  "themeToLight": "Switch to light theme",
+  "book": "Book on WhatsApp",
+  "bookPiece": "I want something like this",
+  "bookPieceCaption": "Opens WhatsApp with this piece attached",
+  "waGreeting": "Hi! I'd like to ask about a tattoo. ",
+  "waPiece": "Hi! I'd like something like \"{name}\" ({url}). ",
+  "homeLine": "[ONE LINE OF COPY, e.g. Custom tattoos by one artist, drawn for you in Ari, Bangkok]",
+  "rating": "{rating} on Google · {count} reviews",
+  "piece": "piece",
+  "pieces": "pieces",
+  "from": "from {price} {thb}",
+  "thb": "THB",
+  "hoursShort": "h",
+  "priceFrom": "Price from",
+  "typicalHours": "Typical hours",
+  "pieceCount": "Pieces",
+  "showMore": "Show more",
+  "nextStyle": "Next style",
+  "allStyles": "All styles",
+  "backTo": "Back to {style}",
+  "prevPiece": "Previous piece",
+  "nextPiece": "Next piece",
+  "session": "session",
+  "sessions": "sessions",
+  "placement": "Placement",
+  "size": "Size",
+  "cm": "cm",
+  "hours": "Hours",
+  "price": "Price",
+  "detail": "Detail",
+  "healed": "Healed",
+  "footerVisit": "Visit",
+  "footerContact": "Contact",
+  "openMap": "Open in Google Maps",
+  "call": "Call",
+  "notFoundTitle": "Page not found",
+  "notFoundText": "This page doesn't exist. The work is still here.",
+  "titles": {
+    "home": "{name} — {tagline}",
+    "style": "{style} tattoos in Bangkok — {name}, Ari",
+    "piece": "{piece}, {style} tattoo — {name}, Bangkok",
+    "artist": "{artist}, tattoo artist in Ari, Bangkok — {name}",
+    "info": "Prices, booking and hours — {name}, Ari Bangkok",
+    "aftercare": "Tattoo aftercare guide — {name}, Bangkok"
+  },
+  "descriptions": {
+    "home": "{tagline}. {rating} on Google from {count} reviews. Styles: {styles}. Book on WhatsApp.",
+    "info": "Prices from {min} THB, {hourly} THB per hour, deposit {deposit}. How a session works, address near {bts}, opening hours {hours}.",
+    "aftercare": "How to look after a new tattoo from {name} in Bangkok: the first days, washing, sun, swimming and when to come back."
+  },
+  "artistPage": {
+    "heading": "About the artist",
+    "workHeading": "Recent work",
+    "reviewsLink": "Read the reviews on Google"
+  },
+  "infoPage": {
+    "heading": "Prices & info",
+    "pricesHeading": "Prices",
+    "minimum": "Minimum",
+    "hourly": "Per hour",
+    "deposit": "Deposit",
+    "stylesHeading": "By style",
+    "processHeading": "How a session works",
+    "process": [
+      {
+        "title": "[STEP 1 TITLE, e.g. Message on WhatsApp]",
+        "text": "[1–2 SENTENCES: send the idea, placement, size and reference pictures]"
+      },
+      {
+        "title": "[STEP 2 TITLE, e.g. Quote and deposit]",
+        "text": "[1–2 SENTENCES: how the price is set and how the deposit is paid]"
+      },
+      {
+        "title": "[STEP 3 TITLE, e.g. Drawing]",
+        "text": "[1–2 SENTENCES: when the client sees the design and how changes work]"
+      },
+      {
+        "title": "[STEP 4 TITLE, e.g. Session day]",
+        "text": "[1–2 SENTENCES: what to eat, wear and bring; how long it takes]"
+      }
+    ],
+    "visitHeading": "Address & hours",
+    "hoursLabel": "Hours",
+    "addressLabel": "Address"
+  },
+  "aftercarePage": {
+    "heading": "Aftercare",
+    "intro": "[1–2 SENTENCES FROM THE ARTIST: why aftercare matters for how the tattoo heals]",
+    "steps": [
+      {
+        "title": "[FIRST HOURS]",
+        "text": "[When to remove the wrap and how to wash the tattoo the first time]"
+      },
+      {
+        "title": "[DAYS 1–7]",
+        "text": "[How often to wash, which cream to use and how much]"
+      },
+      {
+        "title": "[DAYS 7–21]",
+        "text": "[Peeling and itching: what is normal and what not to do]"
+      },
+      {
+        "title": "[SUN, SEA AND POOLS]",
+        "text": "[How long to avoid swimming and direct sun]"
+      },
+      {
+        "title": "[WHEN TO GET IN TOUCH]",
+        "text": "[Signs that need a message to the artist; free touch-up rules]"
+      }
+    ]
+  }
+}

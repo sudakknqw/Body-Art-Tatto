@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { site as getSite } from '../lib/content';
+
+const site = getSite('en');
+const { copy, studio } = site;
+---
+
+<Base site={site} title={`${copy.notFoundTitle} — ${studio.name}`} description={copy.notFoundText} noindex>
+  <main class="page wrap">
+    <h1>{copy.notFoundTitle}</h1>
+    <p class="lead">{copy.notFoundText}</p>
+    <p class="actions"><a class="btn" href="/">{copy.allStyles}</a></p>
+  </main>
+</Base>

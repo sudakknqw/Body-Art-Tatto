@@ -1,0 +1,161 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import { site as getSite, feedCells, fill, coverOf, type Lang } from '../lib/content';
+import { tileSizes } from '../lib/mosaic';
+import { BP } from '../lib/layout';
+import { DESKTOP_ROW_MAX } from '../lib/fold';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+}
+const site = getSite(Astro.props.lang);
+const { studio, styles, copy, prefix } = site;
+const index = styles.findIndex((s) => s.slug === Astro.props.slug);
+const style = styles[index];
+const next = styles[(index + 1) % styles.length];
+// Hand-authored mosaics, 12 pieces per pattern (src/lib/feedMosaic.ts). The
+// first cell is the cover: the home tile's photo lands there, and the build
+// checks it is fully visible without scrolling (src/lib/fold.ts).
+const cells = feedCells(site, style);
+const cover = coverOf(site, style);
+const PAGE = 12;
+
+const title = fill(copy.titles.style, { style: style.name, name: studio.name });
+const cellStyle = ({ desktop: d, mobile: m }: (typeof cells)[number], i: number) =>
+  [
+    `--c:${d.c};--cw:${d.w};--r:${d.r};--rh:${d.h}`,
+    `--mc:${m.c};--mw:${m.w};--mr:${m.r};--mh:${m.h}`,
+    `background:var(--tile-${(i % 6) + 1})`,
+    i === 0 ? `--cover-vt:style-cover-${style.slug}` : '',
+  ].filter(Boolean).join(';');
+// The cover reuses the home tile's sizes, so both load the same file.
+const cellSizes = ({ desktop: d, mobile: m }: (typeof cells)[number], i: number) =>
+  i === 0 ? tileSizes(index, styles.length) : `(min-width: ${BP.desktop}px) ${Math.round((d.w / 12) * 100)}vw, ${Math.round((m.w / 6) * 100)}vw`;
+---
+
+<Base page="feed" site={site} title={title} description={style.description} image={cover?.photo} imageAlt={cover?.alt} current="work">
+  <main>
+    <header class="style-head">
+      <a class="back" href={`${prefix}/`}><span aria-hidden="true">←</span> {copy.allStyles}</a>
+      <h1>{style.name}</h1>
+      <p class="muted desc">{style.description}</p>
+      <dl class="figures">
+        <div><dt>{copy.pieceCount}</dt><dd>{cells.length}</dd></div>
+        <div><dt>{copy.priceFrom}</dt><dd>{style.priceFrom} <span class="unit">{copy.thb}</span></dd></div>
+        <div><dt>{copy.typicalHours}</dt><dd>{style.typicalHours} <span class="unit">{copy.hoursShort}</span></dd></div>
+      </dl>
+    </header>
+
+    <ul class="feed" data-feed style={`--row-max:${DESKTOP_ROW_MAX}px`}>
+      {cells.map((cell, i) => (
+        <li
+          id={`p-${cell.item.slug}`}
+          class:list={['item', 'reveal', { 'is-hidden': i >= PAGE, 'is-cover': i === 0 }]}
+          style={cellStyle(cell, i)}
+        >
+          <a class="tile-link" href={`${prefix}/work/${cell.item.slug}/`} data-vt-photo={cell.item.slug}>
+            <Photo src={cell.item.photo} alt={cell.item.alt} fit="contain" eager={i === 0} sizes={cellSizes(cell, i)} />
+            <span class="visually-hidden">{cell.item.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {cells.length > PAGE && (
+      <div class="more">
+        <button type="button" class="btn btn--ghost js-only" data-more>{copy.showMore}</button>
+      </div>
+    )}
+
+    <nav class="next" aria-label={copy.nextStyle}>
+      <a href={`${prefix}/style/${next.slug}/`}>
+        <span class="caption">{copy.nextStyle}</span>
+        <span class="next-name">{next.name} <span aria-hidden="true">→</span></span>
+      </a>
+    </nav>
+  </main>
+</Base>
+
+<style>
+  .style-head { padding: var(--s18) var(--s16) var(--s22); }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s8);
+    min-height: 44px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  h1 { font-size: 34px; margin-top: var(--s8); }
+  .desc { margin-top: var(--s12); }
+  /* Three equal columns on phones, so long numbers or labels wrap instead of
+     pushing the page sideways (fold.ts measures them the same way). */
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s30);
+    margin-top: var(--s22);
+  }
+  dt, dd { overflow-wrap: anywhere; }
+  dt { font-size: 13px; color: var(--text-caption); }
+  dd { font-size: 22px; font-weight: 500; }
+  .unit { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+
+  /* Authored mosaic (src/lib/feedMosaic.ts). Every cell has explicit grid lines
+     for phones (6 columns) and desktop (12); rows are half a column tall, so
+     the whole mosaic scales with the width like the home page. Hidden batches
+     are display:none and create no rows, so the mosaic simply ends where the
+     last shown piece ends. Seams: each cell draws half the gap. */
+  .feed {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: calc(100vw / 12);
+  }
+  .item {
+    position: relative;
+    grid-column: var(--mc) / span var(--mw);
+    grid-row: var(--mr) / span var(--mh);
+    border: calc(var(--gap) / 2) solid var(--seam);
+  }
+  .js .item.is-hidden { display: none; }
+  .item a { position: absolute; inset: 0; display: block; }
+  .item a:focus-visible { outline-offset: -2px; }
+  .item :global(img) { position: absolute; inset: 0; }
+
+  .more { display: flex; justify-content: center; padding: var(--s30) var(--s16) 0; }
+  .next { padding: var(--s40) var(--s16); }
+  .next a {
+    display: grid;
+    gap: var(--s4);
+    padding: var(--s22) 0;
+    border-top: 1px solid var(--line);
+    text-decoration: none;
+  }
+  .next-name { font-size: 26px; font-weight: 500; }
+
+  @media (min-width: 768px) {
+    .style-head, .next { padding-inline: var(--s40); }
+    h1 { font-size: 42px; }
+  }
+
+  @media (min-width: 1024px) {
+    .style-head { display: grid; grid-template-columns: 1fr auto; column-gap: var(--s56); align-items: end; }
+    .back, h1, .desc { grid-column: 1; }
+    .figures { display: flex; grid-column: 2; grid-row: 2 / span 2; margin: 0; }
+    /* Rows stop growing at --row-max (very wide screens) so the cover cell always
+       fits above the fold — DESKTOP_ROW_MAX in src/lib/fold.ts. */
+    .feed {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-auto-rows: min(calc(100vw / 24), var(--row-max));
+    }
+    .item {
+      grid-column: var(--c) / span var(--cw);
+      grid-row: var(--r) / span var(--rh);
+    }
+  }
+</style>

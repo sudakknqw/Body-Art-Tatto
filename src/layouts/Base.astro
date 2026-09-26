@@ -1,0 +1,153 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { coverOf, counterpart, whatsappHref, type Site } from '../lib/content';
+
+interface Props {
+  site: Site;
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>[];
+  current?: 'work' | 'artist' | 'info' | 'aftercare';
+  bookHref?: string;
+  bookLabel?: string;
+  bookCaption?: string;
+  headerOverlay?: boolean;
+  noindex?: boolean;
+  /** Page kind, used by the view-transition CSS to tell the two ends of a transition apart. */
+  page?: 'home' | 'feed' | 'piece';
+}
+
+const {
+  site,
+  title,
+  description,
+  image,
+  imageAlt,
+  jsonLd = [],
+  current,
+  bookLabel,
+  bookCaption,
+  headerOverlay = false,
+  noindex = false,
+  page,
+} = Astro.props;
+const { studio, copy, lang } = site;
+
+const path = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(path, Astro.site).href;
+const otherPath = noindex ? null : counterpart(path, lang);
+const enPath = lang === 'en' ? path : otherPath;
+const thPath = lang === 'th' ? path : otherPath;
+
+const bookHref = Astro.props.bookHref ?? whatsappHref(studio, copy.waGreeting);
+
+const ogSource = image ?? coverOf(site, site.styles[0])?.photo;
+const og = ogSource ? await getImage({ src: ogSource, width: Math.min(1200, ogSource.width), format: 'jpg', quality: 80 }) : null;
+const ogUrl = og ? new URL(og.src, Astro.site).href : null;
+const ogAlt = imageAlt ?? (image ? '' : coverOf(site, site.styles[0])?.alt) ?? studio.name;
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'TattooParlor',
+  '@id': new URL('/#business', Astro.site).href,
+  name: studio.name,
+  url: new URL(site.prefix + '/', Astro.site).href,
+  image: ogUrl ?? undefined,
+  telephone: studio.phone || undefined,
+  priceRange: `${studio.priceMinimum}+ THB`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: studio.address,
+    addressLocality: 'Bangkok',
+    addressCountry: 'TH',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: studio.latitude, longitude: studio.longitude },
+  openingHours: studio.openingHours.filter(Boolean),
+  hasMap: studio.mapUrl || undefined,
+  sameAs: [studio.instagram && `https://www.instagram.com/${studio.instagram}/`, studio.googleMapsReviewUrl].filter(Boolean),
+  // No aggregateRating: Google only allows ratings collected by this site itself.
+  // The Google rating is shown as plain visible text instead.
+};
+const graphs = [business, ...jsonLd];
+---
+
+<!doctype html>
+<html lang={lang} data-page={page}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {enPath && thPath && (
+      <>
+        <link rel="alternate" hreflang="en" href={new URL(enPath, Astro.site).href} />
+        <link rel="alternate" hreflang="th" href={new URL(thPath, Astro.site).href} />
+        <link rel="alternate" hreflang="x-default" href={new URL(enPath, Astro.site).href} />
+      </>
+    )}
+    <meta name="theme-color" content="#0a0a09" />
+    <link rel="preload" href="/fonts/space-grotesk-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/space-grotesk-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Identical on every page, so the router keeps it (and the loaded fonts) across page changes. -->
+    <style is:inline>
+      @font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/space-grotesk-400.woff2') format('woff2'); }
+      @font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/space-grotesk-500.woff2') format('woff2'); }
+    </style>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={studio.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:locale" content={lang === 'th' ? 'th_TH' : 'en_US'} />
+    {ogUrl && <meta property="og:image" content={ogUrl} />}
+    {og && <meta property="og:image:width" content={String(og.attributes.width)} />}
+    {og && <meta property="og:image:height" content={String(og.attributes.height)} />}
+    {ogUrl && <meta property="og:image:alt" content={ogAlt} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogUrl && <meta name="twitter:image" content={ogUrl} />}
+
+    <script type="application/ld+json" set:html={JSON.stringify(graphs.length === 1 ? graphs[0] : graphs)} />
+
+    <script is:inline>
+      (function () {
+        var d = document.documentElement, t = null;
+        try { t = localStorage.getItem('theme'); } catch (e) {}
+        d.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+        // no-transition: nothing animates while the first frame paints.
+        d.classList.add('js', 'no-transition');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { d.classList.remove('no-transition'); });
+        });
+      })();
+    </script>
+
+    <!-- Pages swap inside one document from here on (src/scripts/site.ts). -->
+    <ClientRouter />
+  </head>
+  <body class:list={{ 'header-overlay': headerOverlay, 'has-bar-caption': !!bookCaption }}>
+    <Header site={site} bookHref={bookHref} altLangHref={otherPath} current={current} />
+    <slot />
+    <!-- Fixed to the bottom on phones; placed before the footer so screen readers reach it right after the page content. -->
+    <div class="book-bar" transition:persist="book-bar">
+      <a class="btn btn--block" href={bookHref}>{bookLabel ?? copy.book}</a>
+      {bookCaption && <p class="caption">{bookCaption}</p>}
+    </div>
+    <Footer site={site} altLangHref={otherPath} />
+
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>

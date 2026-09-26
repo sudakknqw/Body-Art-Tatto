@@ -1,0 +1,77 @@
+---
+import { phoneLink, ratingText, whatsappHref, type Site } from '../lib/content';
+
+interface Props {
+  site: Site;
+  altLangHref: string | null;
+}
+const { site, altLangHref } = Astro.props;
+const { studio, copy, prefix } = site;
+const phone = phoneLink(studio);
+---
+
+<footer class="site-footer">
+  <div class="cols">
+    <section>
+      <h2>{copy.footerVisit}</h2>
+      <p>{studio.address}</p>
+      <p class="muted">{[studio.bts, studio.hours].filter(Boolean).join(' · ')}</p>
+      <p><a href={studio.mapUrl}>{copy.openMap}</a></p>
+    </section>
+    <section>
+      <h2>{copy.footerContact}</h2>
+      <ul>
+        <li><a href={whatsappHref(studio, copy.waGreeting)}>WhatsApp</a></li>
+        {studio.phone && <li>{copy.call}: <a href={phone.href}>{phone.text}</a></li>}
+        {studio.instagram && <li><a href={`https://www.instagram.com/${studio.instagram}/`}>Instagram @{studio.instagram}</a></li>}
+        {studio.line && <li>LINE: {studio.line}</li>}
+      </ul>
+    </section>
+    <section>
+      <h2>{studio.name}</h2>
+      <ul>
+        <li><a href={`${prefix}/`}>{copy.nav.work}</a></li>
+        <li><a href={`${prefix}/artist/`}>{copy.nav.artist}</a></li>
+        <li><a href={`${prefix}/info/`}>{copy.nav.info}</a></li>
+        <li><a href={`${prefix}/aftercare/`}>{copy.nav.aftercare}</a></li>
+        {altLangHref && (
+          <li><a href={altLangHref} hreflang={site.lang === 'en' ? 'th' : 'en'}>{site.lang === 'en' ? 'ภาษาไทย' : 'English'}</a></li>
+        )}
+      </ul>
+    </section>
+  </div>
+  <p class="caption rating">
+    <a href={studio.googleMapsReviewUrl}>{ratingText(site)}</a>
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: var(--s40) var(--s16) var(--s30);
+    font-size: 15px;
+  }
+  .cols { display: grid; gap: var(--s30); }
+  h2 {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+    margin-bottom: var(--s12);
+  }
+  ul { list-style: none; padding: 0; }
+  p + p { margin-top: var(--s4); }
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+    text-underline-offset: 3px;
+  }
+  .rating { margin-top: var(--s30); }
+  .rating a { color: var(--text-caption); }
+  @media (min-width: 768px) {
+    .site-footer { padding-inline: var(--s40); }
+    .cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
