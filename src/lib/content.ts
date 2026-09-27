@@ -6,7 +6,7 @@ import studioEn from '../content/studio.json';
 import stylesEn from '../content/styles.json';
 import piecesEn from '../content/pieces.json';
 import copyEn from '../content/copy.json';
-import { checkFold } from './fold';
+import { checkFold, type Head } from './fold';
 import { layouts } from './mosaic';
 import { coverSlot, layoutFeed, type FeedCell } from './feedMosaic';
 import { PREFIX } from './layout';
@@ -271,15 +271,7 @@ for (const s of sites) {
     if (first.item !== cover || first.mobile.r !== 1 || first.desktop.r !== 1) {
       throw new ContentError(file, `Style "${style.slug}": the home tile shows "${cover.slug}" but the feed's cover cell holds "${first.item.slug}".`);
     }
-    const head = {
-      title: style.name,
-      description: style.description,
-      figures: [
-        [s.copy.pieceCount, String(piecesOf(s, style.slug).length)],
-        [s.copy.priceFrom, `${style.priceFrom} ${s.copy.thb}`],
-        [s.copy.typicalHours, `${style.typicalHours} ${s.copy.hoursShort}`],
-      ],
-    };
+    const head = feedHead(s, style);
     const low = checkFold(head, { mobile: first.mobile.h, desktop: first.desktop.h }).filter((r) => !r.ok);
     if (low.length) {
       contentWarning(
@@ -290,6 +282,19 @@ for (const s of sites) {
       );
     }
   }
+}
+
+/** The feed page's header as the fold model (fold.ts) sees it. */
+export function feedHead(s: Site, style: Style): Head {
+  return {
+    title: style.name,
+    description: style.description,
+    figures: [
+      [s.copy.pieceCount, String(piecesOf(s, style.slug).length)],
+      [s.copy.priceFrom, `${style.priceFrom} ${s.copy.thb}`],
+      [s.copy.typicalHours, `${style.typicalHours} ${s.copy.hoursShort}`],
+    ],
+  };
 }
 
 export function whatsappHref(studio: Studio, message: string): string {

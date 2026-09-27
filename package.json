@@ -11,6 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "placeholders": "node scripts/make-placeholders.mjs",
+    "import": "node scripts/import-photos.mjs",
     "check:html": "html-validate \"dist/**/*.html\""
   },
   "dependencies": {

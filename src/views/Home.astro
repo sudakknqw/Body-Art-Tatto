@@ -34,6 +34,12 @@ const tiles = styles.map((style, i) => {
   };
 });
 
+// Every tile is on the first screen, so all load with the page; the largest on
+// desktop (the hero) and the largest on phones are the page's largest paint, so
+// those two go first.
+const areaOnPhone = (i: number) => layout.mobile.tiles[i][2] * layout.mobile.tiles[i][3];
+const phoneLargest = tiles.reduce((best, _, i) => (areaOnPhone(i) > areaOnPhone(best) ? i : best), 0);
+
 const title = fill(copy.titles.home, { name: studio.name, tagline: studio.tagline });
 const description = fill(copy.descriptions.home, {
   tagline: studio.tagline,
@@ -59,7 +65,7 @@ const description = fill(copy.descriptions.home, {
       {tiles.map((t, i) => (
         <li class:list={['tile', { 'tile--hero': i === 0 }]} style={t.vars} data-style={t.style.slug}>
           <a class="tile-link" href={`${prefix}/style/${t.style.slug}/`}>
-            {t.cover && <Photo src={t.cover.photo} alt="" sizes={t.sizes} eager={i < 2} />}
+            {t.cover && <Photo src={t.cover.photo} alt="" sizes={t.sizes} eager priority={i === 0 || i === phoneLargest} />}
             <div class="label">
               <h2>{t.style.name}</h2>
               <span class="meta">
@@ -101,6 +107,7 @@ const description = fill(copy.descriptions.home, {
     width: 100%;
     aspect-ratio: var(--mobile-ratio);
     background: var(--seam);
+    clip-path: inset(calc(var(--gap) / 2)); /* no seam around the outside */
   }
   .tile {
     position: absolute;
@@ -166,6 +173,7 @@ const description = fill(copy.descriptions.home, {
       grid-template-columns: repeat(12, minmax(0, 1fr));
       grid-template-rows: repeat(6, minmax(0, 1fr));
       gap: var(--gap);
+      clip-path: none; /* tiles have no border here: the seams are the grid gap */
     }
     .tile {
       position: relative;

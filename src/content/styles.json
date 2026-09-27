@@ -16,9 +16,9 @@
     "coverPiece": "ornamental"
   },
   {
-    "slug": "colorillustrative",
-    "name": "ColorIllustrative",
-    "description": "[ColorIllustrative: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "color-illustrative",
+    "name": "Color Illustrative",
+    "description": "[Color Illustrative: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
     "coverPiece": "colorillustrative"
@@ -32,9 +32,9 @@
     "coverPiece": "realism"
   },
   {
-    "slug": "thaibuddhist",
-    "name": "ThaiBuddhist",
-    "description": "[ThaiBuddhist: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
+    "slug": "thai-buddhist",
+    "name": "Thai Buddhist",
+    "description": "[Thai Buddhist: 2 SENTENCES — what it looks like on skin, how it ages, who it suits]",
     "priceFrom": "[NUMBER]",
     "typicalHours": "[NUMBER]",
     "coverPiece": "thaibuddhist"

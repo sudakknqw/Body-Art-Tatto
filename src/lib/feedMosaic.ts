@@ -2,14 +2,20 @@
 // batch 1 uses pattern A, batch 2 B, batch 3 C, batch 4 A again, and so on.
 //
 // Units: desktop has 12 columns, mobile 6 (65px each on the 390px canvas).
-// Rows are half a column tall on both, so a cell [x, y, w, h] is
-// w columns wide and h/2 columns tall: h = 2w is square, h = 3w is 2:3.
-// Every cell is portrait or square.
+// Rows are a quarter of a column on both, so a cell [x, y, w, h] is w columns
+// wide and h/4 columns tall: its shape is 4w/h, and h = 5w is exactly 4:5.
+// Every photo fills its cell (object-fit: cover), so every cell is kept close
+// to 4:5, the shape of most tattoo photos: between 0.73 and 0.89.
 //
-// Rules the patterns were checked against (see README → "Feed mosaic"):
-// flush cells, one dominant cell (never top-left, where the home hero is),
-// no seam that runs on across several cells on both sides, and no cell under
-// 44px at 360px (mobile) or 1024px (desktop) wide.
+// The desktop patterns were found by an exhaustive search over those shapes,
+// then picked by the rules below; with cells this close to 4:5 there is no
+// 12-cell pattern that also avoids every long seam, so the rules are:
+// flush cells, one dominant cell, no seam running the full width or height,
+// no four cells meeting at a point, no two seams one row apart, and no cell
+// under 44px at 360px (mobile) or 1024px (desktop) wide.
+// Phones are built from sections: two columns of staggered "bricks", one
+// full-width 4:5 cell, and a row of three small cells; sections only meet at
+// the full-width cell, so no seam crosses the screen in the middle of a section.
 
 export type Cell = [x: number, y: number, w: number, h: number];
 interface Pattern {
@@ -18,75 +24,77 @@ interface Pattern {
 }
 
 const mirror = (p: Pattern): Pattern => ({ h: p.h, cells: p.cells.map(([x, y, w, h]) => [12 - x - w, y, w, h] as Cell) });
+const flip = (p: Pattern): Pattern => ({ h: p.h, cells: p.cells.map(([x, y, w, h]) => [x, p.h - y - h, w, h] as Cell) });
+const mirrorMobile = (p: Pattern): Pattern => ({ h: p.h, cells: p.cells.map(([x, y, w, h]) => [6 - x - w, y, w, h] as Cell) });
+/** Height of the cover cell (4 columns tall at most, so it fits on the first screen: fold.ts). */
+export const COVER_ROWS = 16;
 
-// Desktop A exists with the cover slot under each third-ish of the page, so the
+// Desktop A exists with the cover slot under each quarter of the page, so the
 // home tile's photo drops into a cell under the columns it came from.
+// Cover and its neighbour, the dominant cell top right, small cells stepping
+// down on the left, two medium cells bottom right.
 const A0: Pattern = {
-  h: 21,
-  cells: [[0, 0, 3, 8], [3, 0, 3, 9], [6, 0, 2, 5], [8, 0, 2, 6], [10, 0, 2, 5], [6, 5, 2, 4], [10, 5, 2, 6], [8, 6, 2, 5], [0, 8, 3, 7], [3, 9, 5, 12], [8, 11, 4, 10], [0, 15, 3, 6]],
+  h: 46,
+  cells: [[0, 0, 3, 16], [3, 0, 3, 16], [6, 0, 6, 27], [0, 16, 2, 11], [2, 16, 2, 9], [4, 16, 2, 11], [2, 25, 2, 10], [0, 27, 2, 10], [4, 27, 4, 19], [8, 27, 4, 19], [2, 35, 2, 11], [0, 37, 2, 9]],
 };
-const A3: Pattern = {
-  h: 22,
-  cells: [[3, 0, 3, 8], [0, 0, 3, 9], [6, 0, 2, 4], [8, 0, 2, 6], [10, 0, 2, 5], [6, 4, 2, 4], [10, 5, 2, 6], [8, 6, 2, 5], [3, 8, 5, 14], [0, 9, 3, 6], [8, 11, 4, 11], [0, 15, 3, 7]],
-};
+const A3: Pattern = { h: 46, cells: [[3, 0, 3, 16], [0, 0, 3, 16], ...A0.cells.slice(2)] };
 const desktopA: Record<number, Pattern> = { 0: A0, 3: A3, 6: mirror(A3), 9: mirror(A0) };
-const desktopB: Pattern = {
-  h: 21,
-  cells: [[0, 0, 3, 9], [3, 0, 2, 4], [5, 0, 3, 7], [8, 0, 4, 11], [3, 4, 2, 5], [5, 7, 3, 6], [0, 9, 5, 12], [8, 11, 2, 5], [10, 11, 2, 6], [5, 13, 3, 8], [8, 16, 2, 5], [10, 17, 2, 4]],
-};
-const desktopC: Pattern = {
-  h: 22,
-  cells: [[0, 0, 3, 6], [3, 0, 2, 5], [5, 0, 2, 6], [7, 0, 5, 13], [3, 5, 2, 5], [0, 6, 3, 7], [5, 6, 2, 4], [3, 10, 4, 12], [0, 13, 3, 9], [7, 13, 2, 4], [9, 13, 3, 9], [7, 17, 2, 5]],
-};
+// B and C are other patterns from the same search, turned over so the big
+// cells sit lower down.
+const desktopB: Pattern = flip({
+  h: 46,
+  cells: [[0, 0, 3, 16], [3, 0, 3, 16], [6, 0, 6, 27], [0, 16, 4, 20], [4, 16, 2, 11], [4, 27, 4, 19], [8, 27, 2, 9], [10, 27, 2, 9], [0, 36, 2, 10], [2, 36, 2, 10], [8, 36, 2, 10], [10, 36, 2, 10]],
+});
+const desktopC: Pattern = mirror(flip({
+  h: 48,
+  cells: [[0, 0, 3, 16], [3, 0, 3, 16], [6, 0, 6, 27], [0, 16, 4, 22], [4, 16, 2, 11], [4, 27, 4, 21], [8, 27, 2, 10], [10, 27, 2, 10], [8, 37, 2, 11], [10, 37, 2, 11], [0, 38, 2, 10], [2, 38, 2, 10]],
+}));
 
-const mobile: Pattern[] = [
-  // A: cover top-left, bricks beside it, a full-width 6:7 cell (390×455 at 390px;
-  // it was a square, which left 25% of the width empty around 3:4 photos), three narrow columns
-  { h: 40, cells: [[0, 0, 3, 8], [3, 0, 3, 6], [3, 6, 3, 8], [0, 8, 3, 6], [0, 14, 6, 14], [0, 28, 2, 6], [2, 28, 2, 4], [4, 28, 2, 6], [2, 32, 2, 4], [0, 34, 2, 6], [4, 34, 2, 6], [2, 36, 2, 4]] },
-  // B: tall cell top-right, dominant lower-left
-  { h: 29, cells: [[0, 0, 2, 4], [2, 0, 4, 10], [0, 4, 2, 5], [0, 9, 2, 4], [2, 10, 2, 4], [4, 10, 2, 5], [0, 13, 2, 5], [2, 14, 2, 4], [4, 15, 2, 5], [0, 18, 4, 11], [4, 20, 2, 4], [4, 24, 2, 5]] },
-  // C: big cells zig-zag left, right, right
-  { h: 30, cells: [[0, 0, 4, 8], [4, 0, 2, 5], [4, 5, 2, 4], [0, 8, 2, 4], [2, 8, 2, 5], [4, 9, 2, 4], [0, 12, 2, 5], [2, 13, 4, 9], [0, 17, 2, 4], [0, 21, 2, 5], [2, 22, 4, 8], [0, 26, 2, 4]] },
-];
+// Phones. A: cover top left in two columns of bricks whose seams never line up,
+// then the full-width dominant cell (390×487 at 390px), then three small cells.
+const mobileA: Pattern = {
+  h: 100,
+  cells: [[0, 0, 3, 16], [3, 0, 3, 14], [3, 14, 3, 15], [0, 16, 3, 16], [3, 29, 3, 15], [0, 32, 3, 14], [3, 44, 3, 16], [0, 46, 3, 14], [0, 60, 6, 30], [0, 90, 2, 10], [2, 90, 2, 10], [4, 90, 2, 10]],
+};
+const mobile: Pattern[] = [mobileA, flip(mobileA), mirrorMobile(mobileA)];
 
 // Short batches: a style with 1–5 pieces (or the last batch of a long feed)
 // gets one of these instead of the first cells of a 12-cell pattern, which
 // would leave holes. Same rules as the patterns, plus a flat bottom edge.
-// Cover cells stay 8 rows tall like pattern A's, so the cover still fits on
+// Cover cells stay 16 rows tall like pattern A's, so the cover still fits on
 // the first screen (fold.ts); that is also why 1–3 pieces on desktop are
-// squares, and why 1–2 can't span the full width: a wider cell would have to
-// be taller or landscape.
+// squares (4 columns × 16 rows), and why 1–2 can't span the full width: a
+// wider cell would have to be taller or landscape.
 const shortDesktop: Cell[][] = [
   [],
-  [[4, 0, 4, 8]],
-  [[2, 0, 4, 8], [6, 0, 4, 8]],
-  [[0, 0, 4, 8], [4, 0, 4, 8], [8, 0, 4, 8]],
-  [[0, 0, 3, 8], [3, 0, 3, 8], [6, 0, 3, 8], [9, 0, 3, 8]],
-  [[0, 0, 3, 8], [3, 0, 6, 16], [9, 0, 3, 9], [0, 8, 3, 8], [9, 9, 3, 7]],
+  [[4, 0, 4, 16]],
+  [[2, 0, 4, 16], [6, 0, 4, 16]],
+  [[0, 0, 4, 16], [4, 0, 4, 16], [8, 0, 4, 16]],
+  [[0, 0, 3, 16], [3, 0, 3, 16], [6, 0, 3, 16], [9, 0, 3, 16]],
+  [[0, 0, 3, 16], [3, 0, 6, 30], [9, 0, 3, 14], [0, 16, 3, 14], [9, 14, 3, 16]],
 ];
-// Phones: 4 and 5 are the top of mobile pattern A, which already ends flat there.
 const shortMobile: Cell[][] = [
   [],
-  [[1, 0, 4, 8]],
-  [[0, 0, 3, 8], [3, 0, 3, 8]],
-  [[0, 0, 3, 8], [3, 0, 3, 8], [0, 8, 6, 14]],
-  mobile[0].cells.slice(0, 4),
-  mobile[0].cells.slice(0, 5),
+  [[1, 0, 4, 16]],
+  [[0, 0, 3, 16], [3, 0, 3, 16]],
+  [[0, 0, 3, 16], [3, 0, 3, 16], [0, 16, 6, 28]],
+  [[0, 0, 3, 16], [3, 0, 3, 14], [3, 14, 3, 16], [0, 16, 3, 14]],
+  [[0, 0, 3, 16], [3, 0, 3, 14], [3, 14, 3, 16], [0, 16, 3, 14], [0, 30, 6, 28]],
 ];
 export const SHORT_MAX = shortDesktop.length - 1;
 
 const pattern = (cells: Cell[]): Pattern => ({ h: Math.max(...cells.map(([, y, , h]) => y + h)), cells });
 /**
  * Desktop short pattern for `n` pieces. With a cover, the cover cell (the
- * 8-row cell in the first row nearest the home tile's slot, mirrored if that
- * is closer) goes first, as pattern A's does.
+ * cover-height cell in the first row nearest the home tile's slot, mirrored if
+ * that is closer) goes first, as pattern A's does.
  */
 function shortPattern(n: number, slot: number | null): Pattern {
   const cells = shortDesktop[n];
   if (slot === null) return pattern(cells);
   const centre = slot + 1.5;
   const options = [cells, mirror(pattern(cells)).cells].flatMap((set) =>
-    set.map((c, i) => ({ set, i, d: Math.abs(c[0] + c[2] / 2 - centre) })).filter(({ set, i }) => set[i][1] === 0 && set[i][3] === 8),
+    set.map((c, i) => ({ set, i, d: Math.abs(c[0] + c[2] / 2 - centre) })).filter(({ set, i }) => set[i][1] === 0 && set[i][3] === COVER_ROWS),
   );
   const best = options.reduce((a, o) => (o.d < a.d ? o : a));
   return pattern([best.set[best.i], ...best.set.filter((_, i) => i !== best.i)]);

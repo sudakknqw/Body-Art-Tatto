@@ -172,8 +172,8 @@ function leave(from: string, to: string) {
 }
 
 /** Warm up the photos a morph lands on, so they aren't blank when the new page is snapshotted. */
-function preload(doc: Document) {
-  const pictures = [...doc.querySelectorAll('.main-photo picture, .is-cover picture')];
+function preload(doc: Document, back?: string) {
+  const pictures = [...doc.querySelectorAll(`.main-photo picture, .is-cover picture${back ? `, #p-${CSS.escape(back)} picture` : ''}`)];
   const loads = pictures.map((p) => $<HTMLImageElement>('img', document.importNode(p, true) as Element)!.decode().catch(() => {}));
   return Promise.race([Promise.all(loads), new Promise((r) => setTimeout(r, 250))]);
 }
@@ -190,7 +190,11 @@ document.addEventListener('astro:before-preparation', (e) => {
     // Aborted: a newer navigation owns the bar. Prevented: a full page load follows.
     if (ev.defaultPrevented || ev.signal.aborted) return;
     leave(from, to);
-    if (morphs) await preload(ev.newDocument);
+    // Back to a feed from a piece: the cell the photo lands in must have its
+    // photo, even if it is one that waits to load (Photo.astro).
+    const back = slug(from, 'work');
+    if (back && slug(to, 'style')) loadPhoto(ev.newDocument.getElementById(`p-${back}`)?.querySelector('.photo[data-wait]') ?? null, false);
+    if (morphs) await preload(ev.newDocument, back);
     stopProgress(); // before the old page is snapshotted
   };
 });
@@ -287,10 +291,34 @@ function morph(a: Element, b: Element) {
 
 // ---------- Per page ----------
 let observer: IntersectionObserver | null = null;
+let photoObserver: IntersectionObserver | null = null;
 const teardown = () => {
   observer?.disconnect();
   observer = null;
+  photoObserver?.disconnect();
+  photoObserver = null;
 };
+
+/** Give a photo that waits (Photo.astro, "wait") its real sources; it fades in as it arrives. */
+function loadPhoto(pic: Element | null, fade = motion) {
+  if (!pic?.hasAttribute('data-wait')) return;
+  pic.removeAttribute('data-wait');
+  const img = pic.querySelector('img')!;
+  if (fade) {
+    img.classList.add('is-pending');
+    const show = () => requestAnimationFrame(() => img.classList.remove('is-pending'));
+    img.addEventListener('load', () => img.decode().then(show, show), { once: true });
+    img.addEventListener('error', show, { once: true });
+  }
+  pic.querySelectorAll('source').forEach((src) => {
+    if (src.dataset.srcset) src.srcset = src.dataset.srcset;
+    delete src.dataset.srcset;
+  });
+  if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+  if (img.dataset.src) img.src = img.dataset.src;
+  delete img.dataset.srcset;
+  delete img.dataset.src;
+}
 
 /** Fade each photo in as it arrives; photos already loaded are left alone. */
 function fadeInPhotos() {
@@ -337,6 +365,22 @@ function feed() {
   orderFeed();
   const items = [...document.querySelectorAll<HTMLElement>('[data-feed] > li')];
   if (!items.length) return;
+  // Photos below the first screen load a quarter of a screen before they scroll in
+  // (the browser's own lazy loading would fetch them all at once).
+  const waiting = items.filter((li) => li.querySelector('.photo[data-wait]'));
+  if (!('IntersectionObserver' in window)) waiting.forEach((li) => loadPhoto(li.querySelector('.photo[data-wait]')));
+  else if (waiting.length) {
+    const io = (photoObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          io.unobserve(en.target);
+          loadPhoto(en.target.querySelector('.photo[data-wait]'));
+        }),
+      { rootMargin: '25% 0px' },
+    ));
+    waiting.forEach((li) => io.observe(li));
+  }
   if (motion && 'IntersectionObserver' in window) {
     const io = (observer = new IntersectionObserver((entries) => {
       entries

@@ -23,15 +23,18 @@
   --tile-4: #e0dacd;
   --tile-5: #e7e2d6;
   --tile-6: #dbd4c5;
-  --gap: 1px;
-  --seam: var(--line);
+  /* Seams between photos: a dark line in both themes. On paper a warm dark grey
+     (#57514a) rather than black: it still separates photos, dark studio
+     backgrounds included, without reading as a black grid. */
+  --gap: 2px;
+  --seam: #57514a;
   --bar-shadow: 0 -4px 16px rgb(22 20 15 / 0.08);
 
   --s2: 2px; --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px;
   --s18: 18px; --s22: 22px; --s30: 30px; --s40: 40px; --s56: 56px;
   --header-h: 56px;
   --bar-h: 80px;
-  --photo-col: 560px; /* piece page photo column, desktop (PHOTO_COL in src/lib/layout.ts) */
+  --photo-col: max(560px, min(80vh, 55vw)); /* piece page photo column, desktop (PHOTO_COL in src/lib/layout.ts) */
   --font: 'Space Grotesk', sans-serif;
 
   /* Text and controls that sit on photos: the same in both themes */
@@ -127,8 +130,9 @@ button { font: inherit; color: inherit; }
 /* ---------- Photos ---------- */
 .photo { display: contents; }
 .photo img { width: 100%; height: 100%; }
-.photo--cover img { object-fit: cover; }
-.photo--contain img { object-fit: contain; }
+.photo img { object-fit: cover; } /* every photo fills its box; boxes are close to 4:5 */
+/* A photo that waits for JavaScript to load it (Photo.astro): without JavaScript its <noscript> copy shows instead */
+html:not(.js) .photo[data-wait] { display: none; }
 
 /* ---------- Page wrapper ---------- */
 .wrap {
@@ -274,8 +278,14 @@ html.no-transition *::after { transition: none !important; }
   /* The site header is the same on both pages, so it simply stays put
      (not on piece pages, where it sits elsewhere on desktop). */
   html:not([data-page='piece']) .site-header { view-transition-name: site-header; }
-  /* The home page copy leaves together with the tiles */
+  /* The home page copy leaves together with the tiles, and the feed's photos only
+     arrive once the tiles have gone (200ms); on the way back the feed leaves first
+     and the tiles follow. Two sets of photos are never on screen together, and
+     nothing ends later than before (380ms). */
   html[data-from='home']::view-transition-old(root) { animation-duration: 200ms; }
+  html[data-from='home']::view-transition-new(root) { animation: vt-in 160ms 200ms cubic-bezier(0.2, 0, 0, 1) both; }
+  html[data-page='home']::view-transition-old(root) { animation: vt-out 140ms cubic-bezier(0.4, 0, 1, 1) both; }
+  html[data-page='home']::view-transition-new(.home-tile) { animation: vt-tile-in 180ms 140ms cubic-bezier(0.2, 0, 0, 1) both; }
 
   /* The feed's own header follows once the photo has settled */
   html[data-from='home'] .style-head .back { view-transition-name: feed-back; }

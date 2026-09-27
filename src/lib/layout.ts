@@ -11,5 +11,9 @@ export const isHomePath = (path: string) => Object.values(PREFIX).some((p) => pa
  */
 export const BP = { tablet: 768, desktop: 1024 } as const;
 
-/** Width of the photo column on a piece page, desktop (also --photo-col in global.css). */
-export const PHOTO_COL = 560;
+/**
+ * Width of the photo column on a piece page, desktop, as a CSS length: 4/5 of
+ * the screen height, so the full-height photo box is 4:5, kept between 560px
+ * and 55% of the window (also --photo-col in global.css).
+ */
+export const PHOTO_COL = 'max(560px, min(80vh, 55vw))';

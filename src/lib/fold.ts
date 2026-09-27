@@ -14,8 +14,8 @@ import { BP } from './layout';
 /** Viewports the cover cell must fit in without scrolling. */
 export const MOBILE = [360, 390, 430].map((w) => ({ w, h: 844 }));
 export const DESKTOP = [1024, 1280, 1440, 1680, 1920].map((w) => ({ w, h: 900 }));
-/** Feed rows are half a column tall; on desktop they stop growing at this height (StyleFeed.astro). */
-export const DESKTOP_ROW_MAX = 72;
+/** Feed rows are a quarter of a column tall; on desktop they stop growing at this height (StyleFeed.astro). */
+export const DESKTOP_ROW_MAX = 36;
 
 const HEADER = 56;
 const BAR = 80; // mobile booking bar covers the bottom of the screen
@@ -25,7 +25,7 @@ const CH = 0.641; // width of "0" in em, for the 62ch description limit
 const lines = (text: string, px: number, width: number) =>
   Math.max(1, Math.ceil((text.length * CHAR * px) / (width * 0.92)));
 
-interface Head {
+export interface Head {
   title: string;
   description: string;
   figures: string[][]; // [label, value] × 3
@@ -54,6 +54,19 @@ function feedTop(w: number, head: Head): number {
   return HEADER + 18 + 44 + 8 + h1 + 12 + desc + figures + 22;
 }
 
+/**
+ * Whether a feed cell whose top is on row `r` (1-based) shows on the first
+ * screen of every checked phone and desktop. Those photos load with the page;
+ * the others wait, and the browser script loads the ones that are on the first
+ * screen of the device at hand right away (StyleFeed.astro, Photo.astro).
+ */
+export function onFirstScreen(head: Head, r: { mobile: number; desktop: number }): boolean {
+  return (
+    MOBILE.every(({ w, h }) => feedTop(w, head) + (r.mobile - 1) * (w / 24) < h - BAR) &&
+    DESKTOP.every(({ w, h }) => feedTop(w, head) + (r.desktop - 1) * Math.min(w / 48, DESKTOP_ROW_MAX) < h)
+  );
+}
+
 export interface FoldResult {
   ok: boolean;
   where: string;
@@ -63,15 +76,15 @@ export interface FoldResult {
 
 /**
  * Bottom edge of the cover cell at every checked viewport. `rows` is the
- * cover's height in half-column rows on each layout (feedMosaic.ts).
+ * cover's height in quarter-column rows on each layout (feedMosaic.ts).
  */
 export function checkFold(head: Head, rows: { mobile: number; desktop: number }): FoldResult[] {
   const mobile = MOBILE.map(({ w, h }) => {
-    const bottom = feedTop(w, head) + rows.mobile * (w / 12);
+    const bottom = feedTop(w, head) + rows.mobile * (w / 24);
     return { ok: bottom <= h - BAR, where: `${w}×${h}`, bottom, fold: h - BAR };
   });
   const desktop = DESKTOP.map(({ w, h }) => {
-    const bottom = feedTop(w, head) + rows.desktop * Math.min(w / 24, DESKTOP_ROW_MAX);
+    const bottom = feedTop(w, head) + rows.desktop * Math.min(w / 48, DESKTOP_ROW_MAX);
     return { ok: bottom <= h, where: `${w}×${h}`, bottom, fold: h };
   });
   return [...mobile, ...desktop];

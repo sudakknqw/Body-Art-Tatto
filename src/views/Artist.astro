@@ -29,7 +29,7 @@ const title = fill(copy.titles.artist, { artist: studio.artist, name: studio.nam
       {recent.map((p, i) => (
         <li style={`background:var(--tile-${(i % 6) + 1})`}>
           <a class="tile-link" href={`${prefix}/work/${p.slug}/`} data-vt-photo={p.slug}>
-            <Photo src={p.photo} alt={p.alt} fit="contain" sizes={`(min-width: 1200px) 373px, (min-width: ${BP.tablet}px) 33vw, 50vw`} />
+            <Photo src={p.photo} alt={p.alt} sizes={`(min-width: 1200px) 373px, (min-width: ${BP.tablet}px) 33vw, 50vw`} />
           </a>
         </li>
       ))}
@@ -44,9 +44,10 @@ const title = fill(copy.titles.artist, { artist: studio.artist, name: studio.nam
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap);
+    background: var(--seam);
     margin-top: var(--s22);
   }
-  .grid li { aspect-ratio: 3 / 4; position: relative; }
+  .grid li { aspect-ratio: 4 / 5; position: relative; }
   .grid a { position: absolute; inset: 0; }
   .grid a:focus-visible { outline-offset: -2px; }
   .grid :global(img) { position: absolute; inset: 0; }
