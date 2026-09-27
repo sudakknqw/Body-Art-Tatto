@@ -324,7 +324,11 @@ function loadPhoto(pic: Element | null, fade = motion) {
 function fadeInPhotos() {
   if (!motion) return;
   // The feed's cover is where the tile transition lands: never hide it.
-  const waiting = [...document.querySelectorAll<HTMLImageElement>('.photo img')].filter((img) => !img.complete && !img.closest('.is-cover'));
+  // First-screen photos (eager) show as soon as they arrive: a fade there only
+  // delays the largest paint.
+  const waiting = [...document.querySelectorAll<HTMLImageElement>('.photo img')].filter(
+    (img) => !img.complete && !img.closest('.is-cover') && img.loading !== 'eager',
+  );
   // Decide a frame later: after a page swap, photos already in the cache can
   // still report `complete = false` for a moment, and must not fade again.
   requestAnimationFrame(() =>
