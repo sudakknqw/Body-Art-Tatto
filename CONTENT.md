@@ -42,7 +42,7 @@ Please keep to these lengths. If the text is longer, the website cannot be built
 
 - Your name, as it should be on the website
 - 2–3 sentences about you: how many years you tattoo, your favourite styles, which languages you speak
-- One short line for the top of the home page (e.g. "Custom tattoos by one artist, in Ari, Bangkok")
+- One short line for the top of the home page (e.g. "Custom tattoos and piercing in the heart of Khao San, Bangkok")
 - **WhatsApp number** — this is the most important one, every "Book" button uses it
 - Phone number, Instagram name, LINE ID (skip what you don't have)
 - Address, and the link to the studio on Google Maps

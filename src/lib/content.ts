@@ -80,6 +80,8 @@ function findPhoto(file: string, where: string): ImageMetadata {
 }
 
 const isFilled = (v: unknown) => typeof v === 'string' && v.trim() !== '';
+/** Filled with real content, not a [PLACEHOLDER] still waiting for the studio. */
+export const isReal = (v: unknown) => isFilled(v) && !/^\[.*\]$/s.test((v as string).trim());
 
 // ---------- English (the source of truth) ----------
 
@@ -87,7 +89,15 @@ if (!isFilled(studioEn.whatsapp)) {
   throw new ContentError('studio.json', '"whatsapp" is empty. Every booking button opens WhatsApp — use digits only, e.g. 66812345678.');
 }
 if (!isFilled(studioEn.addressShort)) {
-  throw new ContentError('studio.json', '"addressShort" is empty. It goes into the page titles, e.g. "Ari, Bangkok".');
+  throw new ContentError('studio.json', '"addressShort" is empty. It goes into the page titles, e.g. "Khao San, Bangkok".');
+}
+// Links to other sites must be full addresses; anything else would be read as a
+// page of this site (e.g. /[GOOGLE MAPS LINK]).
+for (const key of ['mapUrl', 'googleMapsReviewUrl'] as const) {
+  const v = studioEn[key];
+  if (isFilled(v) && !v.startsWith('[') && !/^https?:\/\//.test(v)) {
+    throw new ContentError('studio.json', `"${key}" must be a full link starting with https://, e.g. https://maps.app.goo.gl/...`);
+  }
 }
 
 const styles: Style[] = stylesEn.map((s, i) => {

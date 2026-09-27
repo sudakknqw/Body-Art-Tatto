@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Photo from '../components/Photo.astro';
-import { site as getSite, coverOf, piecesOf, fill, ratingText, type Lang } from '../lib/content';
+import { site as getSite, coverOf, piecesOf, fill, isReal, ratingText, type Lang } from '../lib/content';
 import { layouts, tileSizes, MOBILE_WIDTH } from '../lib/mosaic';
 
 interface Props {
@@ -70,7 +70,7 @@ const description = fill(copy.descriptions.home, {
               <h2>{t.style.name}</h2>
               <span class="meta">
                 {t.count} {t.count === 1 ? copy.piece : copy.pieces}
-                {i === 0 && <> · {fill(copy.from, { price: t.style.priceFrom, thb: copy.thb })}</>}
+                {i === 0 && isReal(t.style.priceFrom) && <> · {fill(copy.from, { price: t.style.priceFrom, thb: copy.thb })}</>}
               </span>
             </div>
           </a>

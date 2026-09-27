@@ -1,6 +1,6 @@
 # Body Art Tattoo — website
 
-Static site for Body Art Tattoo, Ari, Bangkok. Astro, plain CSS, almost no JavaScript. Every booking button opens WhatsApp.
+Static site for Body Art Tattoo, Khao San, Bangkok. Astro, plain CSS, almost no JavaScript. Every booking button opens WhatsApp.
 
 ## Run it locally
 
@@ -18,7 +18,7 @@ npm run check:html # validate the built HTML
 
 | Path | What |
 |---|---|
-| `src/content/studio.json` | Name, address, hours, phone, WhatsApp, prices, Google rating, domain (`siteUrl`). `addressShort` (e.g. "Ari, Bangkok") goes into every page title |
+| `src/content/studio.json` | Name, address, hours, phone, WhatsApp, prices, Google rating, domain (`siteUrl`). `addressShort` (e.g. "Khao San, Bangkok") goes into every page title |
 | `src/content/styles.json` | The 4–8 style tiles on the home page, in display order |
 | `src/content/pieces.json` | Every tattoo shown on the site |
 | `src/content/copy.json` | Button labels, page titles, Info and Aftercare text |
@@ -105,5 +105,7 @@ The first build after adding many photos is slow (72 photos: about 6 minutes), b
 2. In Netlify: **Add new site → Import an existing project**, pick the repo. `netlify.toml` already sets the build command (`npm run build`), the publish folder (`dist`), Node 22 and cache headers.
 3. Set the real domain in `src/content/studio.json` → `siteUrl` (used for canonical URLs, the sitemap and share previews), then connect the same domain in Netlify → Domain settings.
 4. After that, every push to the main branch redeploys the site.
+
+While `hideFromSearch` in `src/content/studio.json` is `true` (the demo), every page has `<meta name="robots" content="noindex, nofollow">` and `robots.txt` disallows everything. Set it to `false` at launch.
 
 After launch, submit `https://yourdomain/sitemap.xml` in Google Search Console, and add the website link to the Google Business profile.
